@@ -2,6 +2,7 @@
 ''' Python Regex Phone Number https://stackoverflow.com/questions/15258708/python-trying-to-check-for-a-valid-phone-number
 	Python Regex Email https://stackoverflow.com/questions/8022530/python-check-for-valid-email-address
 	Python Regex Syntax https://docs.python.org/3/library/re.html
+	Hide Password https://pymotw.com/2/getpass/
 '''
 import re
 import getpass

@@ -26,7 +26,7 @@ def main():
     create_tables(cursor)
 
     print('-----------------------------------------------------------')
-    print('Welcome to Knockoff Uber')
+    print('Welcome to UberLite')
     print('-----------------------------------------------------------')
 
     # DO LOGIN PAGE STUFF HERE???
