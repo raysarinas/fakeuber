@@ -24,7 +24,7 @@ def main():
     cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
     create_tables(cursor)
 
-    email = ""
+    email = None
 
     print('-----------------------------------------------------------')
     print('Welcome to UberLite')
