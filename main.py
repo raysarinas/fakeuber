@@ -1,4 +1,5 @@
 import getpass
+import sqlite3
 from bookings import *
 from login import *
 from modifyrequests import *
@@ -13,10 +14,15 @@ WAITING FOR USER INPUT
 
 def main():
     ''' initialize application or something'''
+    conn = sqlite3.connect("./movie.db") # creates or opens a db in that path
+
+	cursor = conn.cursor()
+	cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
+
     print('hello i guess')
 
     # DO LOGIN PAGE STUFF HERE???
-
+    getLogin(cursor)
     print('enter a number corresponding to whatever whatever below')
     print('1 - offer a ride')
     print('2 - search for rides')
