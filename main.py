@@ -19,7 +19,9 @@ def main():
 	cursor = conn.cursor()
 	cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
 
-    print('hello i guess')
+    print('-----------------------------------------------------------')
+    print('Welcome to Knockoff Uber')
+    print('-----------------------------------------------------------')
 
     # DO LOGIN PAGE STUFF HERE???
     getLogin(cursor)
