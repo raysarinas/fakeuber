@@ -6,40 +6,57 @@
 '''
 import re
 import getpass
-def getLogin(cursor):
+def getLogin(cursor, conn):
 	print('Login')
+
 	while True:
+		# User inputs their email
 		email = input('Enter Email:')
+		# Check valid email
 		emailCheck = re.match("^[_\d\w]+@[_\d\w]+\.[_\d\w]+$", email)
+		# Get password
 		password = getpass.getpass(prompt="Enter Password: ")
+		# Check valid password
 		passwordCheck = re.match("^[_\d\w]$", password)
+		# If both valid, find if exists in table
 		if passwordCheck and emailCheck:
 			cursor.execute('''SELECT * FROM members WHERE email=? AND pwd=?;''', (email,password))
 			rows = cursor.fetchall()
+			# No matching email and password
 			if not rows:
-				print('Login failed: Invalid email/password. Try Again')
+				print('Login failed: Email/Password are incorrect. Try Again')
 				continue
+			# Login Successful
 			else:
 				print('Login Successful!')
 				break
+		# Entered email/password were invalid
 		else:
 			print('Invalid email/password. Try Again')
 
-	cursor.execute('''SELECT content, msgTimestamp FROM members m, inbox i
-								WHERE m.email=i.email AND seen='n';''')
+	# Get all unread messages
+	cursor.execute('''SELECT content, msgTimestamp FROM inbox
+								WHERE email=? AND seen='n';''',(email,))
 	rows = cursor.fetchall()
+	# Check if messages are there
 	if rows:
 		print('Your Unread Messages')
 		print('-----------------------------------------------------------')
+		# For each message print and change to seen
 		for x in rows:
 			print(x["content"])
-			cursor.execute('''UPDATE inbox SET seen=?
-									WHERE content=? AND msgTimestamp=?;''',
-									('y', x["content"], x["msgTimestamp"]))
-
+			cursor.execute('''UPDATE inbox SET seen=y
+									WHERE email=? AND msgTimestamp=?;''',
+									(email, x["msgTimestamp"]))
+		# Commit changes
+		conn.commit()
+	# If empty, no new messages to display
+	else:
+		print('You have no new messages')
+	# User is now logged in
 	return email
 
-def registerNewUser(cursor):
+def registerNewUser(cursor, conn):
 	print('Register a new user')
 	# User enters their email
 	while True:
@@ -88,3 +105,6 @@ def registerNewUser(cursor):
 		else:
 			print('Valid password')
 			break
+	cursor.execute('''INSERT INTO members VALUES (?, ?, ?, ?);''', (email, name, phone, password))
+	conn.commit()
+	return email

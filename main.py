@@ -35,10 +35,10 @@ def main():
         print('2 - Register new user')
         selection = int(input())
         if selection == 1:
-            email = getLogin(cursor)
+            email = getLogin(cursor, conn)
             break
         else if selection == 2:
-            email = registerNewUser(cursor)
+            email = registerNewUser(cursor, conn)
         else:
             print('Invalid Selection. Try Again')
             continue
