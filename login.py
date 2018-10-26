@@ -45,7 +45,7 @@ def getLogin(cursor, conn):
 		# For each message print and change to seen
 		for x in rows:
 			print(x["content"])
-			cursor.execute('''UPDATE inbox SET seen=y
+			cursor.execute('''UPDATE inbox SET seen='y'
 									WHERE email=? AND msgTimestamp=?;''',
 									(email, x["msgTimestamp"]))
 		# Commit changes
@@ -98,13 +98,15 @@ def registerNewUser(cursor, conn):
 	# User inputs their password
 	while True:
 		password = input('Enter your Password: ')
-		# Check if no password was entered
-		if not password:
-			print('No password entered. Please enter a password')
+		# Check if no password was entered or invalid
+		passwordCheck = re.match("^[_\d\w]$", password)
+		if not password or passwordCheck is None:
+			print('Invalid password. Please enter a password')
 			continue
 		else:
 			print('Valid password')
 			break
 	cursor.execute('''INSERT INTO members VALUES (?, ?, ?, ?);''', (email, name, phone, password))
 	conn.commit()
+	print('New Account created!')
 	return email

@@ -1,5 +1,6 @@
 import getpass
 import sqlite3
+from os import system, name
 from tables import *
 from bookings import *
 from login import *
@@ -13,8 +14,16 @@ cursor = None
 
 '''
 WAITING FOR USER INPUT
- https://www.quora.com/How-do-you-make-a-command-to-wait-for-the-user-to-press-ENTER-in-Python
+ https://www.quora.com/How-do-you-make-a-command-to-wait-for-the-user-to-press-ENTER-in-
+Clear command window
+ https://www.geeksforgeeks.org/clear-screen-python/
 '''
+
+def clear():
+    if name == 'nt':
+        _ = system('cls')
+    else:
+        _ = system('clear')
 
 def main():
     ''' initialize application or something'''
