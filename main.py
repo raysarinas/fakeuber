@@ -20,9 +20,8 @@ def main():
     ''' initialize application or something'''
     conn = sqlite3.connect("./movie.db") # creates or opens a db in that path
     # CHANGE ./movie.db TO DATABASE WE WILL USE FOR OUR DATA OR WHATEVER
-
-	cursor = conn.cursor()
-	cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
+    cursor = conn.cursor()
+    cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
     create_tables(cursor)
 
     print('-----------------------------------------------------------')
