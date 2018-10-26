@@ -24,12 +24,25 @@ def main():
     cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
     create_tables(cursor)
 
+    email = ""
+
     print('-----------------------------------------------------------')
     print('Welcome to UberLite')
     print('-----------------------------------------------------------')
-
+    print('Login or Register a new user')
+    while True:
+        print('1 - Login')
+        print('2 - Register new user')
+        selection = int(input())
+        if selection == 1:
+            email = getLogin(cursor)
+            break
+        else if selection == 2:
+            email = registerNewUser(cursor)
+        else:
+            print('Invalid Selection. Try Again')
+            continue
     # DO LOGIN PAGE STUFF HERE???
-    getLogin(cursor)
     print('enter a number corresponding to whatever whatever below')
     print('1 - offer a ride')
     print('2 - search for rides')
