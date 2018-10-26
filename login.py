@@ -9,18 +9,22 @@ import getpass
 def getLogin(cursor):
 	print('Login')
 	while True:
-		email = ""
-		password = ""
 		email = input('Enter Email:')
+		emailCheck = re.match("^[_\d\w]+@[_\d\w]+\.[_\d\w]+$", email)
 		password = getpass.getpass(prompt="Enter Password: ")
-		cursor.execute('''SELECT * FROM members WHERE email=? AND pwd=?;''', (email,password))
-		rows = cursor.fetchall()
-		if not rows:
-			print('Login failed: Invalid email/password. Try Again')
-			continue
+		passwordCheck = re.match("^[_\d\w]$", password)
+		if passwordCheck and emailCheck:
+			cursor.execute('''SELECT * FROM members WHERE email=? AND pwd=?;''', (email,password))
+			rows = cursor.fetchall()
+			if not rows:
+				print('Login failed: Invalid email/password. Try Again')
+				continue
+			else:
+				print('Login Successful!')
+				break
 		else:
-			print('Login Successful!')
-			break
+			print('Invalid email/password. Try Again')
+
 	cursor.execute('''SELECT content, msgTimestamp FROM members m, inbox i
 								WHERE m.email=i.email AND seen='n';''')
 	rows = cursor.fetchall()
@@ -33,12 +37,14 @@ def getLogin(cursor):
 									WHERE content=? AND msgTimestamp=?;''',
 									('y', x["content"], x["msgTimestamp"]))
 
+	return email
+
 def registerNewUser(cursor):
 	print('Register a new user')
 	# User enters their email
 	while True:
 		email = input('Enter Email: ')
-		emailCheck = re.match("^[^@]+@[^@]+\.[^@]+$", email)
+		emailCheck = re.match("^[_\d\w]+@[_\d\w]+\.[_\d\w]+$", email)
 		# Check valid email
 		if emailCheck is None:
 			print('Not an email. Try Again')
