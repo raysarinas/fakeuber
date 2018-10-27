@@ -1,6 +1,9 @@
 import sqlite3
 
-def create_tables(cursor):
+def create_tables(cursor, conn):
+
+    # DELETE THE TABLE IF ALREADY EXISTS
+    cursor.execute('''DROP TABLE movie;''')
 
     # THIS IS HOW TO MAKE THE TABLES I GUESS
     cursor.execute('''CREATE TABLE movie (
@@ -13,7 +16,7 @@ def create_tables(cursor):
 
     file = open('prj-tables.sql', 'r')
     sqlFile = file.read()
-    fd.close()
+    file.close()
 
 def executeScriptsFromFile(filename):
     # Open and read the file as a single buffer

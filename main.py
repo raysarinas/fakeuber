@@ -31,7 +31,7 @@ def main():
     # CHANGE ./movie.db TO DATABASE WE WILL USE FOR OUR DATA OR WHATEVER
     cursor = conn.cursor()
     cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
-    create_tables(cursor)
+    create_tables(cursor, conn)
 
     email = None
 
@@ -46,7 +46,7 @@ def main():
         if selection == 1:
             email = getLogin(cursor, conn)
             break
-        else if selection == 2:
+        elif selection == 2:
             email = registerNewUser(cursor, conn)
         else:
             print('Invalid Selection. Try Again')
