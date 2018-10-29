@@ -17,11 +17,14 @@ def getBookings(loginEmail, cursor, conn):
             continue
 
 def bookBooking(loginEmail, cursor, conn):
-    pass #ajabdvkiasdvkjasdbvkjasbv
+    print('Your Rides Offered:')
+    cursor.execute('''SELECT DISTINCT r.* FROM bookings b, rides r WHERE driver=? AND b.rno=r.rno;''', (loginEmail,))
+    userOffers = cursor.fetchall()
+    print(userOffers)
 
 def cancelBooking(loginEmail, cursor, conn):
     print('Your Current Bookings:')
-    cursor.execute('''SELECT DISTINCT * FROM bookings b, rides r WHERE driver=? AND b.rno=r.rno;''', (loginEmail,))
+    cursor.execute('''SELECT DISTINCT b.* FROM bookings b, rides r WHERE driver=? AND b.rno=r.rno;''', (loginEmail,))
     userBookings = cursor.fetchall()
     print(userBookings)
     while True:
