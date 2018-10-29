@@ -36,7 +36,7 @@ def cancelBooking(loginEmail, cursor, conn):
             continue
         content = input('Explain reason for cancelation: ')
         cursor.execute('''INSERT INTO inbox VALUES (?,
-                          datetime('now'), ?, ?, ?, n);''',(cancelSelected["email"], loginEmail, content, cancelSelected["rno"]))
+                          datetime('now'), ?, ?, ?, 'n');''',(cancelSelected["email"], loginEmail, content, cancelSelected["rno"]))
         cursor.execute('''DELETE FROM bookings WHERE bno=?;''', (cancelBno,))
-        print('Booking ? has been cancelled. ? will be notified of the cancellation', ())
+        print('Booking ? has been cancelled. ? will be notified of the cancellation', (cancelBno, cancelSelected["email"]))
         conn.commit()
