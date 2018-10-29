@@ -35,7 +35,7 @@ def getLogin(cursor, conn):
 			print('Invalid email/password. Try Again')
 
 	# Get all unread messages
-	cursor.execute('''SELECT content, msgTimestamp FROM inbox
+	cursor.execute('''SELECT DISTINCT content, msgTimestamp FROM inbox
 								WHERE email=? AND seen='n';''',(email,))
 	rows = cursor.fetchall()
 	# Check if messages are there
