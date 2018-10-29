@@ -17,7 +17,7 @@ def getBookings(loginEmail, cursor, conn):
             continue
 
 def bookBooking(loginEmail, cursor, conn):
-    ajabdvkiasdvkjasdbvkjasbv
+    pass #ajabdvkiasdvkjasdbvkjasbv
 
 def cancelBooking(loginEmail, cursor, conn):
-    siduvsdkjbviusdjnvsdiuv
+    pass #siduvsdkjbviusdjnvsdiuv

@@ -2,12 +2,10 @@ import getpass
 import sqlite3
 from os import system, name
 from tables import *
+from rides import *
 from bookings import *
+from riderequests import *
 from login import *
-from modifyrequests import *
-from offer import *
-from postrequests import *
-from searchrides import *
 
 connection = None
 cursor = None
