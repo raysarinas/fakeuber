@@ -62,18 +62,24 @@ def main():
     user_input = int(input())
 
     if (user_input == 1):
+        clear()
         print('call offer ride stuff')
 
     if (user_input == 2):
+        clear()
         print('search for rides')
 
     if (user_input == 3):
+        clear()
         print('booking shit')
+        getBookings(email, cursor, conn)
 
     if (user_input == 4):
+        clear()
         print('post ride requests')
 
     if (user_input == 5):
+        clear()
         print('search and delete ride requests')
 
     if (user_input == 420):
