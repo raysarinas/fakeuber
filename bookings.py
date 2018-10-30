@@ -2,6 +2,7 @@
 '''
 https://stackoverflow.com/questions/26451888/sqlite-get-x-rows-then-next-x-rows
 '''
+import re
 def getBookings(loginEmail, cursor, conn):
     print('Offer/Cancel a Booking')
     print('-----------------------------------------------------------')
@@ -23,27 +24,50 @@ def bookBooking(loginEmail, cursor, conn):
     print('Your Rides Offered:')
     counter = 0
     while True:
-        cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(b.seats,0) as available FROM bookings b, rides r WHERE driver LIKE ?
+        cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(b.seats,0) as available, COUNT(r.*) as total
+                                              FROM bookings b, rides r WHERE driver LIKE ?
                                               AND b.rno=r.rno
                                               LIMIT ?,5;''', (loginEmail,counter))
         userOffers = cursor.fetchall()
-        for x in userOffers:
-            print(x['r.*'], 'Available Seats: ', x['available'])
-            #print('''Price: ? Ride Date: ? Num of seats: ? Source: ? Dest: ? Seats available: ?
-                    #''',(x['price'],x['rdate'],x['seats'],x['src'],x['dst'],x['available']))
+        if counter < userOffers["total"]:
+            for x in userOffers:
+                print(x['r.*'], 'Available Seats: ', x['available'])
+                #print('''Price: ? Ride Date: ? Num of seats: ? Source: ? Dest: ? Seats available: ?
+                        #''',(x['price'],x['rdate'],x['seats'],x['src'],x['dst'],x['available']))
+        else:
+            print("End of List")
         selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride').upper()
         if selectMore == "NEXT":
             counter += 5
             continue
         elif selectMore == "BOOK":
-            getBookingInfo(loginEmail, cursor, conn)
+            getBookingInfo(loginEmail, userOffers, cursor, conn)
         elif selectMore == "EXIT":
             break
         else:
             print('Invalid command entered. Try again')
 
-def getBookingInfo(loginEmail, cursor, conn):
+def getBookingInfo(loginEmail, userOffers, cursor, conn):
+	# User enters their email
+    while True:
+    	email = input('Enter the email of the member you want to book: ')
+    	emailCheck = re.match("^[_\d\w]+@[_\d\w]+\.[_\d\w]+$", email)
+    	# Check valid email
+    	if emailCheck is None:
+    		print('Not an email. Try Again')
+    		continue
+    	# Check if email is unique
+    	cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (email,))
+    	rows = cursor.fetchall()
+    	# is not None means email exists therefore is not unique
+    	if rows is None:
+    		print('Member does not exist. Use a different email')
+    		continue
+    	else:
+    		print('Valid email')
+    		break
 
+    
 
 
 def cancelBooking(loginEmail, cursor, conn):
