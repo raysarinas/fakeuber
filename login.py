@@ -20,7 +20,7 @@ def getLogin(cursor, conn):
 		passwordCheck = re.match("^[_\d\w]$", password)
 		# If both valid, find if exists in table
 		if passwordCheck and emailCheck:
-			cursor.execute('''SELECT * FROM members WHERE email=? AND pwd=?;''', (email,password))
+			cursor.execute('''SELECT * FROM members WHERE email LIKE ? AND pwd=?;''', (email,password))
 			rows = cursor.fetchall()
 			# No matching email and password
 			if not rows:
@@ -36,7 +36,7 @@ def getLogin(cursor, conn):
 
 	# Get all unread messages
 	cursor.execute('''SELECT DISTINCT content, msgTimestamp FROM inbox
-								WHERE email=? AND seen='n';''',(email,))
+								WHERE email LIKE ? AND seen='n';''',(email,))
 	rows = cursor.fetchall()
 	# Check if messages are there
 	if rows:
@@ -46,7 +46,7 @@ def getLogin(cursor, conn):
 		for x in rows:
 			print(x["content"])
 			cursor.execute('''UPDATE inbox SET seen='y'
-									WHERE email=? AND msgTimestamp=?;''',
+									WHERE email LIKE ? AND msgTimestamp=?;''',
 									(email, x["msgTimestamp"]))
 		# Commit changes
 		conn.commit()
@@ -67,7 +67,7 @@ def registerNewUser(cursor, conn):
 			print('Not an email. Try Again')
 			continue
 		# Check if email is unique
-		cursor.execute('SELECT * FROM members WHERE email=?;', (email,))
+		cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (email,))
 		rows = cursor.fetchall()
 		# is not None means email exists therefore is not unique
 		if rows is not None:

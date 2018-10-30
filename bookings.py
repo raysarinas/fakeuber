@@ -1,4 +1,7 @@
 # 3 - BOOK MEMBERS OR CANCEL BOOKINGS
+'''
+https://stackoverflow.com/questions/26451888/sqlite-get-x-rows-then-next-x-rows
+'''
 def getBookings(loginEmail, cursor, conn):
     print('Offer/Cancel a Booking')
     print('-----------------------------------------------------------')
@@ -18,9 +21,30 @@ def getBookings(loginEmail, cursor, conn):
 
 def bookBooking(loginEmail, cursor, conn):
     print('Your Rides Offered:')
-    cursor.execute('''SELECT DISTINCT r.* FROM bookings b, rides r WHERE driver=? AND b.rno=r.rno;''', (loginEmail,))
-    userOffers = cursor.fetchall()
-    print(userOffers)
+    counter = 1
+    while True:
+        cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(b.seats,0) as available FROM bookings b, rides r WHERE driver=?
+                                              AND b.rno=r.rno
+                                              LIMIT ?,5;''', (loginEmail,(counter-1)*5))
+        userOffers = cursor.fetchall()
+        for x in userOffers:
+            print(x['r.*'], 'Available Seats: ', x['available'])
+            #print('''Price: ? Ride Date: ? Num of seats: ? Source: ? Dest: ? Seats available: ?
+                    #''',(x['price'],x['rdate'],x['seats'],x['src'],x['dst'],x['available']))
+        selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride').upper()
+        if selectMore == "NEXT":
+            counter += 1
+            continue
+        elif selectMore == "BOOK":
+            getBookingInfo(loginEmail, cursor, conn)
+        elif selectMore == "EXIT":
+            break
+        else:
+            print('Invalid command entered. Try again')
+
+def getBookingInfo(loginEmail, cursor, conn):
+
+
 
 def cancelBooking(loginEmail, cursor, conn):
     print('Your Current Bookings:')
