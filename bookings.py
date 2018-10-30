@@ -21,11 +21,11 @@ def getBookings(loginEmail, cursor, conn):
 
 def bookBooking(loginEmail, cursor, conn):
     print('Your Rides Offered:')
-    counter = 1
+    counter = 0
     while True:
-        cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(b.seats,0) as available FROM bookings b, rides r WHERE driver=?
+        cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(b.seats,0) as available FROM bookings b, rides r WHERE driver LIKE ?
                                               AND b.rno=r.rno
-                                              LIMIT ?,5;''', (loginEmail,(counter-1)*5))
+                                              LIMIT ?,5;''', (loginEmail,counter))
         userOffers = cursor.fetchall()
         for x in userOffers:
             print(x['r.*'], 'Available Seats: ', x['available'])
@@ -33,7 +33,7 @@ def bookBooking(loginEmail, cursor, conn):
                     #''',(x['price'],x['rdate'],x['seats'],x['src'],x['dst'],x['available']))
         selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride').upper()
         if selectMore == "NEXT":
-            counter += 1
+            counter += 5
             continue
         elif selectMore == "BOOK":
             getBookingInfo(loginEmail, cursor, conn)
@@ -48,7 +48,7 @@ def getBookingInfo(loginEmail, cursor, conn):
 
 def cancelBooking(loginEmail, cursor, conn):
     print('Your Current Bookings:')
-    cursor.execute('''SELECT DISTINCT b.* FROM bookings b, rides r WHERE driver=? AND b.rno=r.rno;''', (loginEmail,))
+    cursor.execute('''SELECT DISTINCT b.* FROM bookings b, rides r WHERE driver LIKE ? AND b.rno=r.rno;''', (loginEmail,))
     userBookings = cursor.fetchall()
     print(userBookings)
     while True:
