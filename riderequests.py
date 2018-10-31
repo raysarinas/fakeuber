@@ -32,5 +32,8 @@ def seadelRequest(conn):
         # pickup location matching INPUT
     # SHOW AT MOST 5 MATCHES
     # SCROLL THROUGH NEXT PAGE????
-    # BE ABLE TO MESSAGE THE POSTING MEMBER WTF
+    # BE ABLE TO MESSAGE THE POSTING MEMBER
+        # QUERY using INBOX
+        # should be able to query or input something into the inbox table
+        # test out using separate examples and stuff probably
     pass
