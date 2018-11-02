@@ -44,10 +44,12 @@ def getLogin(cursor, conn):
 		print('-----------------------------------------------------------')
 		# For each message print and change to seen
 		for x in rows:
-			print(x[3])
+			content = 0
+			timestamp = 1
+			print(x[content])
 			cursor.execute('''UPDATE inbox SET seen='y'
 									WHERE email LIKE ? AND msgTimestamp=?;''',
-									(email, x["msgTimestamp"]))
+									(email, x[timestamp]))
 		# Commit changes
 		conn.commit()
 	# If empty, no new messages to display
@@ -69,20 +71,23 @@ def registerNewUser(cursor, conn):
 		# Check if email is unique
 		cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (email,))
 		rows = cursor.fetchall()
-		# is not None means email exists therefore is not unique
-		if rows is not None:
+		# not rows means email exists therefore is not unique
+		if not rows:
+			break
+		else:
 			print('Email already exists. Use a different email')
 			continue
-		else:
-			print('Valid email')
-			break
+
 	# User inputs their name
 	while True:
-		name = input('Enter your Name: ')
+		name = input('Enter your Name(Can contain spaces, "-" and "."): ')
+		nameCheck = re.match("^[\-\.\w\ ]+$", name)
 		# Check if no name was entered
 		if not name:
 			print('No name entered. Please enter a name')
 			continue
+		elif nameCheck is None:
+			print('Invalid name entered.')
 		else:
 			break
 	# User inputs their phone number
@@ -94,17 +99,16 @@ def registerNewUser(cursor, conn):
 			print('Invalid Phone Number. Try Again')
 			continue
 		else:
-			print('Valid Phone Number')
+			break
 	# User inputs their password
 	while True:
-		password = input('Enter your Password: ')
+		password = getpass.getpass(prompt="Enter Your Password: ")
 		# Check if no password was entered or invalid
-		passwordCheck = re.match("^[_\d\w]$", password)
+		passwordCheck = re.match("^[_\d\w]+$", password)
 		if not password or passwordCheck is None:
 			print('Invalid password. Please enter a password')
 			continue
 		else:
-			print('Valid password')
 			break
 	cursor.execute('''INSERT INTO members VALUES (?, ?, ?, ?);''', (email, name, phone, password))
 	conn.commit()
