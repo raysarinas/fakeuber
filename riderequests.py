@@ -54,10 +54,12 @@ def seadelRequest(conn):
     pass
 
     while True:
+        pass
         # copy JuJu's Display/Search STUFF
         #
 
 def message(conn, email):
+    pass
     # EMAILING/MESSAGING BETWEEN MEMBERS???
     # put crap into a table and then like do stuff i guess
     # just INSERT message into the email table

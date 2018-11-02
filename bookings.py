@@ -23,13 +23,18 @@ def getBookings(loginEmail, cursor, conn):
 def bookBooking(loginEmail, cursor, conn):
     print('Your Rides Offered:')
     counter = 0
+    cursor.execute('''SELECT DISTINCT COUNT(r.*) as total
+                                          FROM bookings b, rides r WHERE driver LIKE ?
+                                          AND b.rno=r.rno''',(loginEmail,))
+    totalRides = cursor.fetchone()
+    totalRidesNum = totalRides["total"]
     while True:
-        cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(b.seats,0) as available, COUNT(r.*) as total
-                                              FROM bookings b, rides r WHERE driver LIKE ?
-                                              AND b.rno=r.rno
-                                              LIMIT ?,5;''', (loginEmail,counter))
-        userOffers = cursor.fetchall()
-        if counter < userOffers["total"]:
+        if counter < totalRidesNum:
+            cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(b.seats,0) as available
+                                                  FROM bookings b, rides r WHERE driver LIKE ?
+                                                  AND b.rno=r.rno
+                                                  LIMIT ?,5;''', (loginEmail,counter))
+            userOffers = cursor.fetchall()
             for x in userOffers:
                 print(x['r.*'], 'Available Seats: ', x['available'])
                 #print('''Price: ? Ride Date: ? Num of seats: ? Source: ? Dest: ? Seats available: ?
@@ -48,7 +53,15 @@ def bookBooking(loginEmail, cursor, conn):
             print('Invalid command entered. Try again')
 
 def getBookingInfo(loginEmail, userOffers, cursor, conn):
-	# User enters their email
+    # User enters ride # they want associated with new booking
+    while True:
+        rno = int(input())
+        for x in userOffers:
+            if rno == x["rno"]:
+                break
+        continue
+
+	# User enters member's email
     while True:
     	email = input('Enter the email of the member you want to book: ')
     	emailCheck = re.match("^[_\d\w]+@[_\d\w]+\.[_\d\w]+$", email)
@@ -56,16 +69,17 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
     	if emailCheck is None:
     		print('Not an email. Try Again')
     		continue
-    	# Check if email is unique
     	cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (email,))
-    	rows = cursor.fetchall()
-    	# is not None means email exists therefore is not unique
-    	if rows is None:
+    	emails = cursor.fetchall()
+    	if emails is None:
     		print('Member does not exist. Use a different email')
     		continue
     	else:
     		print('Valid email')
     		break
+
+    while True:
+        pass
 
 
 

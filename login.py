@@ -13,7 +13,7 @@ def getLogin(cursor, conn):
 		# User inputs their email
 		email = input('Enter Email:')
 		# Check valid email
-		emailCheck = re.match("^[_\d\w]+@[_\d\w]+\.[_\d\w]+$", email)
+		emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", email)
 		# Get password
 		password = getpass.getpass(prompt="Enter Password: ")
 		# Check valid password

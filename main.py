@@ -66,7 +66,7 @@ def main():
     # DO LOGIN PAGE STUFF HERE???
 
     systemFunctionalities(cursor, conn, email)
-    exitProgram(conn) # close the database? exit program 
+    exitProgram(conn) # close the database? exit program
 
 def systemFunctionalities(cursor, conn, email):
     print('Watcha wanna do? Enter a number below I guess')
@@ -108,3 +108,4 @@ def systemFunctionalities(cursor, conn, email):
 
 if __name__ == "__main__":
     main()
+    exit()
