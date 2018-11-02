@@ -112,7 +112,14 @@ def create_tables_test(cursor, conn):
 
     ''')
 
-def test():
+    cursor.execute('''INSERT INTO members
+                VALUES ('jane_doe@abc.ca', 'Jane Maria-Ann Doe', '780-342-7584', 'jpass');
+''')
+
+    conn.commit()
+
+
+def main():
     conn = sqlite3.connect("./project.db") # creates or opens a db in that path
 
     cursor = conn.cursor()
@@ -122,57 +129,15 @@ def test():
 
     create_tables_test(cursor, conn)
 
-
-def create_tables(cursor, conn):
-
-    # DELETE THE TABLE IF ALREADY EXISTS
-    cursor.execute('''DROP TABLE movie;''')
-
-    # THIS IS HOW TO MAKE THE TABLES I GUESS
-    cursor.execute('''CREATE TABLE movie (
-                                            title TEXT,
-                                            movie_number INTEGER,
-                                            PRIMARY KEY (title)
-                                            );''')
-
-    conn.commit() # commit changes made in transaction
-
-    file = open('prj-tables.sql', 'r')
-    sqlFile = file.read()
-    file.close()
-
-def executeScriptsFromFile(filename):
-    # Open and read the file as a single buffer
-    fd = open(filename, 'r')
-    sqlFile = fd.read()
-    for line in fd:
-        print(line)
-    fd.close()
-
-    # all SQL commands (split on ';')
-    sqlCommands = sqlFile.split(';')
-
-    # Execute every command from the input file
-    for command in sqlCommands:
-        # This will skip and report errors
-        # For example, if the tables do not yet exist, this will skip over
-        # the DROP TABLE commands
-        pass
-        try:
-            c.execute(command)
-        except (OperationalError, msg):
-            print("Command skipped: ", msg)
-
-if __name__ == "__tables__":
-
-    print('hello')
-    conn = sqlite3.connect("./test.db") # creates or opens a db in that path
-    cursor = conn.cursor()
-    create_tables_test(cursor, conn)
-
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM movie')
+    cursor.execute('SELECT * FROM members')
     one_row = cursor.fetchone()
     print('hello')
     print(one_row)
+
+
+if __name__ == "__main__":
+
+    print('hello')
+    main()
