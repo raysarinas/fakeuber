@@ -13,7 +13,7 @@ def getBookings(loginEmail, cursor, conn):
         if choice == 1:
             cancelBooking(loginEmail, cursor, conn)
             break
-        else if choice == 2:
+        elif choice == 2:
             bookBooking(loginEmail, cursor, conn)
             break
         else:
@@ -67,7 +67,7 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
     		print('Valid email')
     		break
 
-    
+
 
 
 def cancelBooking(loginEmail, cursor, conn):

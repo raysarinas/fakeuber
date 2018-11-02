@@ -1,6 +1,7 @@
 import getpass
 import sqlite3
 from os import system, name
+from sys import exit
 from tables import *
 from rides import *
 from bookings import *
@@ -23,6 +24,12 @@ def clear():
     else:
         _ = system('clear')
 
+def exitProgram(conn):
+    print("ok bye program exited")
+    conn.commit()
+    conn.close()
+    exit()
+
 def main():
     ''' initialize application or something'''
     conn = sqlite3.connect("./movie.db") # creates or opens a db in that path
@@ -39,13 +46,16 @@ def main():
     print('Login or Register a new user')
     while True:
         print('1 - Login')
-        print('2 - Register new user')
+        print('2 - Register New User')
+        print('3 - Exit Program')
         selection = int(input())
         if selection == 1:
             email = getLogin(cursor, conn)
             break
         elif selection == 2:
             email = registerNewUser(cursor, conn)
+        elif selection == 3:
+            exitProgram(conn)
         else:
             print('Invalid Selection. Try Again')
             continue
@@ -85,8 +95,7 @@ def main():
 
 
     # COMMIT CHANGES AND THEN CLOSE THE CONNECTION to DATABASE THINGY
-    conn.commit()
-    conn.close()
+    exit(conn)
 
 if __name__ == "__main__":
     main()
