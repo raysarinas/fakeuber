@@ -55,21 +55,24 @@ def bookBooking(loginEmail, cursor, conn):
 def getBookingInfo(loginEmail, userOffers, cursor, conn):
     # User enters ride # they want associated with new booking
     while True:
-        rno = int(input())
+        rno = int(input('Enter Ride #: '))
+        numSeatsBook = int(input('Enter # of seats you want to book: '))
         for x in userOffers:
             if rno == x["rno"]:
+                if numSeatsBook > x["available"]:
+                    print("Warning! There are overbooked seats on this ride")
                 break
         continue
 
 	# User enters member's email
     while True:
-    	email = input('Enter the email of the member you want to book: ')
-    	emailCheck = re.match("^[_\d\w]+@[_\d\w]+\.[_\d\w]+$", email)
+    	emailMember = input('Enter the email of the member you want to book: ')
+    	emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", emailMember)
     	# Check valid email
     	if emailCheck is None:
     		print('Not an email. Try Again')
     		continue
-    	cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (email,))
+    	cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (emailMember,))
     	emails = cursor.fetchall()
     	if emails is None:
     		print('Member does not exist. Use a different email')
@@ -77,12 +80,30 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
     	else:
     		print('Valid email')
     		break
-
+    # Get cost per seat
+    costPerSeat = int(input('Enter the cost per seat: '))
+    # Get pickup and dropoff location codes
     while True:
-        pass
+        pickUp = input('Enter the pickup location code: ')
+        dropOff = input('Enter the dropoff location code: ')
+        cursor.execute('''SELECT src, dst FROM rides WHERE rno=?''', (rno,))
+        locationCodes = cursor.fetchone()
+        if locationCodes["src"] != pickUp:
+            print('Invalid pickup code.')
+            continue
+        if locationCodes["dst"] != dropOff:
+            print('Invalid dropoff code.')
+            continue
+        break
 
-
-
+    cursor.execute('''SELECT MAX(bno)+1 as lastNum FROM bookings''')
+    maxBno = cursor.fetchone()
+    maxBno = maxBno["lastNum"]
+    cursor.execute('''INSERT INTO bookings VALUES
+                        (?, ?, ?, ?, ?, ?, ?)''',(maxBno, emailMember, rno, costPerSeat, numSeatsBook, pickUp, dropOff))
+    cursor.execute('''INSERT INTO inbox VALUES (?, datetime('now'), 'You have been booked on the following ride'
+                                        , 'n');''', (emailMember, loginEmail, rno))
+    conn.commit()
 
 def cancelBooking(loginEmail, cursor, conn):
     print('Your Current Bookings:')
