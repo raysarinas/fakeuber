@@ -15,7 +15,7 @@ def postRequest(conn, email):
         # previous request posted or just whatever
     # set email to email address of member
     pass
-
+    clear() # do i need to import something so this works or what
     print('Post a Ride Request by entering the following information: ')
     counter = 0
     while True:
@@ -29,6 +29,7 @@ def postRequest(conn, email):
             VALUES (?, ?, ?, ?, ?, ?)''', (counter, email, date, pickup, dropoff, pay))
 
         conn.commit()
+        break
 
 def seadelRequest(conn):
     '''
@@ -51,3 +52,13 @@ def seadelRequest(conn):
         # should be able to query or input something into the inbox table
         # test out using separate examples and stuff probably
     pass
+
+    while True:
+        # copy JuJu's Display/Search STUFF
+        #
+
+def message(conn, email):
+    # EMAILING/MESSAGING BETWEEN MEMBERS???
+    # put crap into a table and then like do stuff i guess
+    # just INSERT message into the email table
+    # and then like have an option to like display the email or whatever i guess

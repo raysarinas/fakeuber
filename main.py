@@ -32,7 +32,15 @@ def exitProgram(conn):
 
 def main():
     ''' initialize application or something'''
+
+    print('-----------------------------------------------------------')
+    print('Welcome to UberLite')
+    print('-----------------------------------------------------------')
+    print('Login or Register a new user')
+
+    #TODO: PERHAPS CHANGE THIS SO THE DATABASE IS NOT HARDCODED IN??????
     conn = sqlite3.connect("./movie.db") # creates or opens a db in that path
+
     # CHANGE ./movie.db TO DATABASE WE WILL USE FOR OUR DATA OR WHATEVER
     cursor = conn.cursor()
     cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
@@ -40,10 +48,6 @@ def main():
 
     email = None
 
-    print('-----------------------------------------------------------')
-    print('Welcome to UberLite')
-    print('-----------------------------------------------------------')
-    print('Login or Register a new user')
     while True:
         print('1 - Login')
         print('2 - Register New User')
@@ -60,12 +64,18 @@ def main():
             print('Invalid Selection. Try Again')
             continue
     # DO LOGIN PAGE STUFF HERE???
-    print('enter a number corresponding to whatever whatever below')
+
+    systemFunctionalities(cursor, conn, email)
+    exitProgram(conn) # close the database? exit program 
+
+def systemFunctionalities(cursor, conn, email):
+    print('Watcha wanna do? Enter a number below I guess')
     print('1 - offer a ride')
     print('2 - search for rides')
     print('3 - book members or cancel bookings')
     print('4 - post ride requests')
     print('5 - search and delete ride requests')
+    print('6 - exit program and fuck off')
 
     user_input = int(input())
 
@@ -84,19 +94,17 @@ def main():
 
     if (user_input == 4):
         clear()
-        print('post ride requests')
         postRequest(conn, email)
 
     if (user_input == 5):
         clear()
         print('search and delete ride requests')
 
+    if (user_input == 6):
+        exitProgram(conn)
+
     if (user_input == 420):
         print('blaze it')
-
-
-    # COMMIT CHANGES AND THEN CLOSE THE CONNECTION to DATABASE THINGY
-    exit(conn)
 
 if __name__ == "__main__":
     main()
