@@ -1,7 +1,7 @@
 # 4 - POST RIDE REQUESTS
 # 5 - SEARCH AND DELETE RIDE requests
 
-def postRequest(conn):
+def postRequest(conn, email):
     '''
     The member should be able to post a ride request by providing a date,
     a pick up location code, a drop off location code, and the amount willing
@@ -15,6 +15,20 @@ def postRequest(conn):
         # previous request posted or just whatever
     # set email to email address of member
     pass
+
+    print('Post a Ride Request by entering the following information: ')
+    counter = 0
+    while True:
+        date = input('Ride Date? ')
+        pickup = input('Pickup Code? ')
+        dropoff = input('Dropoff Code? ')
+        pay = input('How much are you willing to pay per seat? ')
+        counter += 1 # is this wrong? tf
+
+        cursor.execute('''INSERT INTO requests
+            VALUES (?, ?, ?, ?, ?, ?)''', (counter, email, date, pickup, dropoff, pay))
+
+        conn.commit()
 
 def seadelRequest(conn):
     '''

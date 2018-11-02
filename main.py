@@ -85,6 +85,7 @@ def main():
     if (user_input == 4):
         clear()
         print('post ride requests')
+        postRequest(conn, email)
 
     if (user_input == 5):
         clear()
