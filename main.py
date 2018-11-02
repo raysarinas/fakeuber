@@ -2,7 +2,7 @@ import getpass
 import sqlite3
 from os import system, name
 from sys import exit
-from tables import *
+#from tables import *
 from rides import *
 from bookings import *
 from riderequests import *
@@ -39,12 +39,12 @@ def main():
     print('Login or Register a new user')
 
     #TODO: PERHAPS CHANGE THIS SO THE DATABASE IS NOT HARDCODED IN??????
-    conn = sqlite3.connect("./movie.db") # creates or opens a db in that path
+    conn = sqlite3.connect("./test.db") # creates or opens a db in that path
 
     # CHANGE ./movie.db TO DATABASE WE WILL USE FOR OUR DATA OR WHATEVER
     cursor = conn.cursor()
     cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
-    create_tables(cursor, conn)
+    #create_tables(cursor, conn)
 
     email = None
 

@@ -53,6 +53,8 @@ def bookBooking(loginEmail, cursor, conn):
             print('Invalid command entered. Try again')
 
 def getBookingInfo(loginEmail, userOffers, cursor, conn):
+    rno, numSeatsBook = 0
+    emailMember, pickUp, dropOff = None
     # User enters ride # they want associated with new booking
     while True:
         rno = int(input('Enter Ride #: '))

@@ -13,11 +13,11 @@ def getLogin(cursor, conn):
 		# User inputs their email
 		email = input('Enter Email:')
 		# Check valid email
-		emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", email)
+		emailCheck = re.match("^[\\_\d\w]+\\@[\\_\d\w]+\.[\\_\d\w]+$", email)
 		# Get password
 		password = getpass.getpass(prompt="Enter Password: ")
 		# Check valid password
-		passwordCheck = re.match("^[_\d\w]$", password)
+		passwordCheck = re.match("^[\d\w]+$", password)
 		# If both valid, find if exists in table
 		if passwordCheck and emailCheck:
 			cursor.execute('''SELECT * FROM members WHERE email LIKE ? AND pwd=?;''', (email,password))
@@ -44,7 +44,7 @@ def getLogin(cursor, conn):
 		print('-----------------------------------------------------------')
 		# For each message print and change to seen
 		for x in rows:
-			print(x["content"])
+			print(x[3])
 			cursor.execute('''UPDATE inbox SET seen='y'
 									WHERE email LIKE ? AND msgTimestamp=?;''',
 									(email, x["msgTimestamp"]))
