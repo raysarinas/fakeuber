@@ -11,10 +11,10 @@ def getBookings(loginEmail, cursor, conn):
     while True:
         choice = int(input('Please enter 1 or 2: '))
         if choice == 1:
-            cancelBooking(loginEmail, cursor, conn)
+            bookBooking(loginEmail, cursor, conn)
             break
         elif choice == 2:
-            bookBooking(loginEmail, cursor, conn)
+            cancelBooking(loginEmail, cursor, conn)
             break
         else:
             print('Invalid choice dumbass do it again')
