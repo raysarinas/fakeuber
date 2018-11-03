@@ -14,6 +14,17 @@ def clear():
     one function and like just have different options for functionalities
     like in Kathleen's code? with home function in requests.py '''
 
+
+# COMBINE getRideNum and getReqID into one function that takes
+# the table as another parameter so dont have too much redundant code?
+def getReqID(cursor, conn, email):
+    cursor.execute(''' SELECT MAX(requests.rid) FROM requests;''')
+    last = cursor.fetchall()
+    if last == None:
+        return 1
+    rid = int(last[0][0])+ 1
+    return rid
+
 def postRequest(cursor, conn, email):
     '''
     The member should be able to post a ride request by providing a date,
@@ -21,15 +32,11 @@ def postRequest(cursor, conn, email):
     to pay per seat. The request rid is set by your system to a unique number
     and the email is set to the email address of the member.
     '''
-    # TAKE date, pickup code, dropoff code and amount willing to pay
-    # as input from USER.
-    # need to assign that value with a unique request RID
-        # could just use an incrementer so every new one is just +1 from
-        # previous request posted or just whatever
-    # set email to email address of member
-    pass
     clear() # do i need to import something so this works or what
     print('Post a Ride Request by entering the following information: ')
+
+    conn.commit()
+
     counter = 0
     while True:
         date = input('Ride Date (YYYY-MM-DD)?')
@@ -38,12 +45,12 @@ def postRequest(cursor, conn, email):
             print('Invalid Date. Try Again')
             continue
         # CALL rides.getLocation AS PICKUP AND DROPOFF
-        pickup = input('Pickup Code? ')
-        dropoff = input('Dropoff Code? ')
+        pickup = rides.getLoc(cursor, conn, email)
+        dropoff = rides.getLoc(cursor, conn, email)
         amount = input('How much are you willing to pay per seat? ')
-        rid = rides.getRideNum(cursor, conn, email)
+        rid = getReqID(cursor, conn, email)
         cursor.execute('''INSERT INTO requests
-                VALUES (?, ?, ?, ?, ?, ?)''', (rid, email, date, pickup, dropoff, amount))
+                VALUES (?, ?, ?, ?, ?, ?);''', (rid, email, date, pickup, dropoff, amount))
         conn.commit()
 
         # elif confirm.upper() == 'N':
@@ -85,10 +92,10 @@ def searchDeleteRequest(cursor, conn, email):
         selection = int(input('Please enter 1 or 2: '))
         if selection == 1:
             searchRequest(cursor, conn, email)
-            #break
+            break
         elif selection == 2:
             deleteRequest(cursor, conn, email)
-            #break
+            break
         elif selection == 3:
             message(cursor, conn, email)
             #break
@@ -176,12 +183,17 @@ def deleteRequest(cursor, conn, email):
     clear()
     getAllRequests(cursor, conn, email)
     while True:
-        delete = input("Enter the ID of the ride request you wish to delete: ")
+        delete = int(input("Enter the ID of the ride request you wish to delete: "))
 
-        ridList = 0 # should call rid function to fetch all rid's???
+        cursor.execute("SELECT rid FROM requests")
+        get = cursor.fetchall()
+        ridNums = set()
+        for tuple in get:
+            if tuple[0] not in ridNums:
+                ridNums.add(tuple[0])
         # maybe like change this to a set of integers so can find easily
-        if delete in ridList: # if input is a valid RID then like delete it
-            cursor.execute("DELETE FROM requests WHERE rid = ?", (delete))
+        if delete in ridNums: # if input is a valid RID then like delete it
+            cursor.execute("DELETE FROM requests WHERE rid = ?", (delete,))
             conn.commit()
             print("Ride Request Deleted!")
             break

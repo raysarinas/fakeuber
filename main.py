@@ -90,7 +90,6 @@ def main():
             print('Invalid Selection. Try Again')
             continue
     # DO LOGIN PAGE STUFF HERE???
-
     systemFunctionalities(cursor, conn, email)
     exitProgram(conn) # close the database? exit program
 
@@ -133,6 +132,15 @@ def systemFunctionalities(cursor, conn, email):
 
     if (user_input == 420):
         print('blaze it')
+
+    while True:
+        cont = str(input('Do you want to continue? \n Enter 1 to Continue, otherwise exit/logout: '))
+
+        if cont is '1':
+            clear()
+            systemFunctionalities(cursor, conn, email)
+        else: # REPLACE THIS WITH LOG OUT FUNCTION
+            exitProgram(conn)
 
 if __name__ == "__main__":
     main()
