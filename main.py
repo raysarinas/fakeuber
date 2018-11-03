@@ -97,11 +97,11 @@ def systemFunctionalities(cursor, conn, email):
 
     if (user_input == 4):
         clear()
-        postRequest(conn, email)
+        postRequest(cursor, conn, email)
 
     if (user_input == 5):
         clear()
-        print('search and delete ride requests')
+        searchDeleteRequest(cursor, conn, email)
 
     if (user_input == 6):
         exitProgram(conn)

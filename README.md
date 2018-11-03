@@ -27,4 +27,6 @@ The member should be able to post a ride request by providing a date, a pick up 
 #### 5 - Search and delete ride requests.
 
 The member should be able to see all his/her ride requests and be able to delete any of them. Also the member should be able to provide a location code or a city and see a listing of all requests with a pickup location matching the location code or the city entered. If there are more than 5 matches, at most 5 matches will be shown at a time. The member should be able to select a request and message the posting member, for example asking the member to check out a ride.
+
+### SQL INJECTION?
 Groups of size 3 must counter SQL injection attacks and make the password non-visible at the time of typing.
