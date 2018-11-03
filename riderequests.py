@@ -1,7 +1,9 @@
 # 4 - POST RIDE REQUESTS
 # 5 - SEARCH AND DELETE RIDE requests
 
-def postRequest(conn, email):
+import re
+
+def postRequest(cursor, conn, email):
     '''
     The member should be able to post a ride request by providing a date,
     a pick up location code, a drop off location code, and the amount willing
@@ -19,19 +21,35 @@ def postRequest(conn, email):
     print('Post a Ride Request by entering the following information: ')
     counter = 0
     while True:
-        date = input('Ride Date? ')
+        date = input('Ride Date (YYYY-MM-DD)?')
+        dateCheck = re.match("^[\d]{4}+\\-[\d]{4}-[\d]{4}$")
+        if dateCheck is None:
+            print('Invalid Date. Try Again')
+            continue
+        # CALL rides.getLocation AS PICKUP AND DROPOFF
         pickup = input('Pickup Code? ')
         dropoff = input('Dropoff Code? ')
-        pay = input('How much are you willing to pay per seat? ')
-        counter += 1 # is this wrong? tf
+        amount = input('How much are you willing to pay per seat? ')
 
+        # clear()
+        # print("Date | Pickup | Dropoff | Amount willing to Pay")
+        # print(str(date) + " | " + str(pickup) + " | " + str(dropoff) + " | " + str(amount))
+        # confirm = input("Confirm the entered information by entering 'Y' or 'N':")
+        #
+        # if confirm.upper() == 'Y':
+        # CALL GET RID
         cursor.execute('''INSERT INTO requests
-            VALUES (?, ?, ?, ?, ?, ?)''', (counter, email, date, pickup, dropoff, pay))
-
+                VALUES (?, ?, ?, ?, ?, ?)''', (rid, email, date, pickup, dropoff, amount))
         conn.commit()
+
+        # elif confirm.upper() == 'N':
+        #     continue
+        #
+        # else:
+        #     print("Invalid")
         break
 
-def seadelRequest(conn):
+def seadelRequest(cursor, conn, email):
     '''
     The member should be able to see all his/her ride requests and be able
     to delete any of them. Also the member should be able to provide a

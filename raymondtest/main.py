@@ -113,7 +113,7 @@ def create_tables_test(cursor, conn):
     ''')
 
     cursor.execute('''INSERT INTO members
-                VALUES ('jane_doe@abc.ca', 'Jane Maria-Ann Doe', '780-342-7584', 'jpass');
+                VALUES ('jane_doe@abc.ca', 'Jane Maria-Ann Doe', '780-342-7584', 'jpass'),
 ''')
 
     conn.commit()
