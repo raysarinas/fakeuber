@@ -83,6 +83,7 @@ def systemFunctionalities(cursor, conn, email):
     if (user_input == 1):
         clear()
         print('call offer ride stuff')
+        offerRide(cursor, conn, email)
 
     if (user_input == 2):
         clear()

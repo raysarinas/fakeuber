@@ -46,13 +46,8 @@ def checkValidDate(date):
         return False
 
 def getCarNum(cursor, conn):
-    #get email
+    #get email####################
     carNum = input("Enter car number: ")
-    cursor.execute("SELECT cno from cars where owner = ? and cno = ?", (email, car))
+    cursor.execute("SELECT cno from cars where owner = ? and cno = ?", (email, carNum))
 	if cursor.fetchone() != None:
-		return car
-	cont = input("That car does not belong to you - would you like to enter another (Y/N)? ")
-	if cont.upper() == 'Y':
-		return get_car(cursor, connection, email)
-	else:
-		return None
+		return carNum
