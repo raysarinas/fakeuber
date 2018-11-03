@@ -1,7 +1,7 @@
 # 4 - POST RIDE REQUESTS
 # 5 - SEARCH AND DELETE RIDE requests
 
-import re
+import re, rides
 from os import system, name
 
 def clear():
@@ -41,14 +41,7 @@ def postRequest(cursor, conn, email):
         pickup = input('Pickup Code? ')
         dropoff = input('Dropoff Code? ')
         amount = input('How much are you willing to pay per seat? ')
-
-        # clear()
-        # print("Date | Pickup | Dropoff | Amount willing to Pay")
-        # print(str(date) + " | " + str(pickup) + " | " + str(dropoff) + " | " + str(amount))
-        # confirm = input("Confirm the entered information by entering 'Y' or 'N':")
-        #
-        # if confirm.upper() == 'Y':
-        # CALL GET RID
+        rid = rides.getRideNum(cursor, conn, email)
         cursor.execute('''INSERT INTO requests
                 VALUES (?, ?, ?, ?, ?, ?)''', (rid, email, date, pickup, dropoff, amount))
         conn.commit()
@@ -110,7 +103,7 @@ def getAllRequests(cursor, conn, email):
     requests = cursor.fetchall()
     print("ID | Date | Pickup | Dropoff | Amount")
     for request in requests:
-        print(request[0] + " | " + request[2] + " | " + request[3] + " | " + request[4] + " | " + request[5])
+        print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]))
     print("\n")
 
 def searchRequest(cursor, conn, email):

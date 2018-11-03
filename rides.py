@@ -49,10 +49,10 @@ def offerRide(cursor, conn, email):
     assignRideNum = getRideNum(cursor, conn, email)
     if len(enrouteSet) != 0:
         for loc in enrouteSet:
-            cursor.execute("INSERT INTO enroute values (?, ?)", (assignRideNum, loc))
-            connection.commit()
-    cursor.execute("INSERT INTO rides values (?, ?, ?, ?, ?, ?, ?, ?, ?)", (assignRideNum, seatPrice, date, numSeats, luggage, sourceLoc, destLoc, email, carNum))
-    connection.commit()
+            cursor.execute("INSERT INTO enroute values (?, ?);", (assignRideNum, loc))
+            conn.commit()
+    cursor.execute("INSERT INTO rides values (?, ?, ?, ?, ?, ?, ?, ?, ?);", (assignRideNum, seatPrice, date, numSeats, luggage, sourceLoc, destLoc, email, carNum))
+    conn.commit()
     askAddAnotherRide = input("Would you like to add another ride? [Y/N] ")
     if askAddAnotherRide.upper() == Y:
         offer(cursor, connection, email)
