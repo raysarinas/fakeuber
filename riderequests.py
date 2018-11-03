@@ -92,15 +92,19 @@ def searchDeleteRequest(cursor, conn, email):
         selection = int(input('Please enter 1 or 2: '))
         if selection == 1:
             searchRequest(cursor, conn, email)
+            #break
         elif selection == 2:
             deleteRequest(cursor, conn, email)
+            #break
         elif selection == 3:
             message(cursor, conn, email)
+            #break
         else:
             print('Invalid choice dum dum')
             continue
 
 def getAllRequests(cursor, conn, email):
+    clear()
     # query all the ride requests and then print them to the screen
     cursor.execute(''' SELECT * FROM requests WHERE email = ?''', (email,))
     requests = cursor.fetchall()
@@ -123,6 +127,7 @@ def searchRequest(cursor, conn, email):
             break
 
         elif viewMode == 2:
+            clear()
             # SHOULD HAVE OPTION TO SELECT LOCATION CODE OR CITY AS INPUT?
             # OR SHOULD JUST AUTOMATICALLY TRY TO CHECK?
             filter = input("Enter a pickup location code or city to find ride requests: ")

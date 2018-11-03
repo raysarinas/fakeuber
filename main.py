@@ -1,6 +1,7 @@
 import getpass
 import sqlite3
 from os import system, name
+import os.path
 from sys import exit
 #from tables import *
 from rides import *
@@ -16,6 +17,8 @@ WAITING FOR USER INPUT
  https://www.quora.com/How-do-you-make-a-command-to-wait-for-the-user-to-press-ENTER-in-
 Clear command window
  https://www.geeksforgeeks.org/clear-screen-python/
+Checking if database exists or not
+ https://stackoverflow.com/questions/12932607/how-to-check-if-a-sqlite3-database-exists-in-python
 '''
 
 def clear():
@@ -32,9 +35,12 @@ def exitProgram(conn):
 
 '''TEST FUNCTION TO TRY AND POPULATE DATABASE'''
 def populate(conn, cursor):
-    data = open("prj-tables.sql", "r")
-    for line in data.readlines():
-        line = line.strip()
+    #data = open("prj-tables.sql", "r")
+    data = open('prj-data.sql').read()
+    cursor.executescript(data)
+    conn.commit()
+    # for line in data.readlines():
+    #     line = line.strip()
         #print(line)
         #cursor.execute(line)
         #conn.commit()
@@ -48,13 +54,16 @@ def main():
     print('Login or Register a new user')
 
     #TODO: PERHAPS CHANGE THIS SO THE DATABASE IS NOT HARDCODED IN??????
-    conn = sqlite3.connect("./uberDB.db") # creates or opens a db in that path
+    db = "./uberDB.db"
+    check = os.path.isfile(db)
+    conn = sqlite3.connect(db) # creates or opens a db in that path
 
     # CHANGE ./movie.db TO DATABASE WE WILL USE FOR OUR DATA OR WHATEVER
     cursor = conn.cursor()
+    #populate(conn, cursor)
 
-    # TESTING
-    populate(conn, cursor)
+    if not check: #if db not exists, populate
+        populate(conn, cursor)
 
     cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
     #create_tables(cursor, conn)
