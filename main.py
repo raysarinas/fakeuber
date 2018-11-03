@@ -88,6 +88,7 @@ def systemFunctionalities(cursor, conn, email):
     if (user_input == 2):
         clear()
         print('search for rides')
+        searchRides(cursor, conn, email)
 
     if (user_input == 3):
         clear()
