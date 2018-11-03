@@ -30,6 +30,15 @@ def exitProgram(conn):
     conn.close()
     exit()
 
+'''TEST FUNCTION TO TRY AND POPULATE DATABASE'''
+def populate(conn, cursor):
+    data = open("prj-tables.sql", "r")
+    for line in data.readlines():
+        line = line.strip()
+        #print(line)
+        #cursor.execute(line)
+        #conn.commit()
+
 def main():
     ''' initialize application or something'''
 
@@ -43,8 +52,15 @@ def main():
 
     # CHANGE ./movie.db TO DATABASE WE WILL USE FOR OUR DATA OR WHATEVER
     cursor = conn.cursor()
+
+    # TESTING
+    populate(conn, cursor)
+
     cursor.execute('PRAGMA foreign_keys=ON;') # set foreign key constraint
     #create_tables(cursor, conn)
+
+    # TESTING
+    #cursor.execute(''' INSERT''')
 
     email = None
 

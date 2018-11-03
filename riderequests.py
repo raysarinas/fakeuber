@@ -2,6 +2,13 @@
 # 5 - SEARCH AND DELETE RIDE requests
 
 import re
+from os import system, name
+
+def clear():
+    if name == 'nt':
+        _ = system('cls')
+    else:
+        _ = system('clear')
 
 ''' could potentially combine the ride request functions into
     one function and like just have different options for functionalities
@@ -26,7 +33,7 @@ def postRequest(cursor, conn, email):
     counter = 0
     while True:
         date = input('Ride Date (YYYY-MM-DD)?')
-        dateCheck = re.match("^[\d]{4}+\\-[\d]{4}-[\d]{4}$")
+        dateCheck = re.match("^[\d]{4}\\-[\d]{2}\\-[\d]{2}$", date)
         if dateCheck is None:
             print('Invalid Date. Try Again')
             continue
@@ -82,7 +89,7 @@ def searchDeleteRequest(cursor, conn, email):
     ''')
 
     while True:
-        selection = input('Please enter 1 or 2: ')
+        selection = int(input('Please enter 1 or 2: '))
         if selection == 1:
             searchRequest(cursor, conn, email)
         elif selection == 2:
@@ -113,6 +120,7 @@ def searchRequest(cursor, conn, email):
 
         if viewMode == 1:
             getAllRequests(cursor, conn, email)
+            break
 
         elif viewMode == 2:
             # SHOULD HAVE OPTION TO SELECT LOCATION CODE OR CITY AS INPUT?

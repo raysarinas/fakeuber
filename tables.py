@@ -7,10 +7,10 @@ def make(cursor, conn):
     to build the table???? or could just parse the prj-tables.sql file mayhaps
     '''
 
-def create_tables_test(cursor, conn):
+def create_tables(cursor, conn):
     #TODO: PARSE THE prj-tables.sql FILE INTO HERE?
-    fh = open("prj-tables.sql", "r")
-    print(fh.readlines())
+    # fh = open("prj-tables.sql", "r")
+    # print(fh.readlines())
     cursor.executescript('''
 
     drop table if exists requests;
