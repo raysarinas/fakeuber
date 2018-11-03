@@ -39,7 +39,7 @@ def main():
     print('Login or Register a new user')
 
     #TODO: PERHAPS CHANGE THIS SO THE DATABASE IS NOT HARDCODED IN??????
-    conn = sqlite3.connect("./test.db") # creates or opens a db in that path
+    conn = sqlite3.connect("./uberDB.db") # creates or opens a db in that path
 
     # CHANGE ./movie.db TO DATABASE WE WILL USE FOR OUR DATA OR WHATEVER
     cursor = conn.cursor()
@@ -58,6 +58,7 @@ def main():
             break
         elif selection == 2:
             email = registerNewUser(cursor, conn)
+            break
         elif selection == 3:
             exitProgram(conn)
         else:
@@ -82,10 +83,12 @@ def systemFunctionalities(cursor, conn, email):
     if (user_input == 1):
         clear()
         print('call offer ride stuff')
+        offerRide(cursor, conn, email)
 
     if (user_input == 2):
         clear()
         print('search for rides')
+        searchRides(cursor, conn, email)
 
     if (user_input == 3):
         clear()
