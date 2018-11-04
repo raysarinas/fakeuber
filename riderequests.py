@@ -1,7 +1,7 @@
 # 4 - POST RIDE REQUESTS
 # 5 - SEARCH AND DELETE RIDE requests
 
-import re, rides
+import re, rides, datetime, time
 from os import system, name
 
 def clear():
@@ -53,11 +53,8 @@ def postRequest(cursor, conn, email):
                 VALUES (?, ?, ?, ?, ?, ?);''', (rid, email, date, pickup, dropoff, amount))
         conn.commit()
 
-        # elif confirm.upper() == 'N':
-        #     continue
-        #
-        # else:
-        #     print("Invalid")
+        print('Ride Request Posted!')
+
         break
 
 def searchDeleteRequest(cursor, conn, email):
@@ -70,140 +67,211 @@ def searchDeleteRequest(cursor, conn, email):
     should be able to select a request and message the posting member, for
     example asking the member to check out a ride.
     '''
-    # display / query ride requests RELATED TO member (i.e. EMAIL)
-    # match the query thing with member email
-    # INPUT: location code or city and then QUERY and list all requests with
-        # pickup location matching INPUT
-    # SHOW AT MOST 5 MATCHES
-    # SCROLL THROUGH NEXT PAGE????
-    # BE ABLE TO MESSAGE THE POSTING MEMBER
-        # QUERY using INBOX
-        # should be able to query or input something into the inbox table
-        # test out using separate examples and stuff probably
     clear()
-    print('''Ride Request Management
-    -----------------------------------------------------------
-    1 - View/Search Your Ride Requests
-    2 - Delete Ride Requests
-    3 - Message Posting Member
-    ''')
+    print('''Ride Request Management''')
+    print('-----------------------------------------------------------')
+    print("1 - Manage Your Ride Requests")
+    print("2 - Search Ride Requests")
+    print("3 - Message Posting Member")
+    print("4 - Go Back")
 
     while True:
-        selection = int(input('Please enter 1 or 2: '))
-        if selection == 1:
+        selection = input('Please enter 1, 2, 3, or 4: ')
+        if selection == '1':
+            manageYourRequests(cursor, conn, email)
+            break
+        elif selection == '2':
             searchRequest(cursor, conn, email)
             break
-        elif selection == 2:
-            deleteRequest(cursor, conn, email)
+        elif selection == '3':
+            print('default will message to don@mayor.yeg because cant test out otherwise?')
+            messagePoster(cursor, conn, email, 'don@mayor.yeg')
             break
-        elif selection == 3:
-            message(cursor, conn, email)
-            #break
+        elif selection == '4':
+            break
         else:
             print('Invalid choice dum dum')
             continue
 
-def getAllRequests(cursor, conn, email):
+# def displayUserRequests(cursor, conn, email):
+#     clear()
+#     requests = cursor.fetchall()
+#     if len(requests) == 0:
+#         print('You have no ride requests!')
+#     else:
+#         print("ID | Date | Pickup | Dropoff | Amount")
+#         for request in requests:
+#             print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]))
+#         print("\n")
+
+def manageYourRequests(cursor, conn, email):
     clear()
+    while True:
     # query all the ride requests and then print them to the screen
-    cursor.execute(''' SELECT * FROM requests WHERE email = ?''', (email,))
-    requests = cursor.fetchall()
-    print("ID | Date | Pickup | Dropoff | Amount")
-    for request in requests:
-        print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]))
-    print("\n")
+        cursor.execute(''' SELECT * FROM requests WHERE email = ?''', (email,))
+        requests = cursor.fetchall()
+        if len(requests) == 0:
+            print('You have no ride requests!')
+            break
+        else:
+            print("Your Ride Requests:")
+            print("ID | Date | Pickup | Dropoff | Amount")
+            for request in requests:
+                print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]))
+            print("\n")
+            print("If you wish to delete a ride request, enter the ID of the ride request you wish to delete.")
+            delOption = input("Otherwise, enter anything else: ")
+
+            delCheck = re.match("^[\d]+$", delOption)
+
+            if delCheck is None:
+                break
+
+            else:
+                cursor.execute("SELECT rid FROM requests")
+                get = cursor.fetchall()
+                ridNums = set()
+
+                for tuple in get:
+                    if tuple[0] not in ridNums:
+                        ridNums.add(tuple[0])
+
+                if delete in ridNums: # if input is a valid RID then like delete it
+                    cursor.execute("DELETE FROM requests WHERE rid = ?", (delete,))
+                    conn.commit()
+                    print("Ride Request Deleted!")
+                    break
+                else:
+                    print("ID not found. Try a different ID or exit.")
+                    continue
+
+# def deleteRequest(cursor, conn, email):
+#     clear()
+#     #getAllRequests(cursor, conn, email)
+#     while True:
+#
+#         print("Otherwise, enter an")
+#         delete = int(input("Enter the ID of the ride request you wish to delete: "))
+#
+#         cursor.execute("SELECT rid FROM requests")
+#         get = cursor.fetchall()
+#         ridNums = set()
+#         for tuple in get:
+#             if tuple[0] not in ridNums:
+#                 ridNums.add(tuple[0])
+#
+#         if delete in ridNums: # if input is a valid RID then like delete it
+#             cursor.execute("DELETE FROM requests WHERE rid = ?", (delete,))
+#             conn.commit()
+#             print("Ride Request Deleted!")
+#             break
+#         else:
+#             print("ID not found. Try a different ID or exit.")
+#             continue
+
 
 def searchRequest(cursor, conn, email):
     clear()
     while True:
-        print('''Enter how you want to search or view your ride requests:
-        1 - View All
-        2 - Filter by Pickup Location ''')
+        clear()
+        # SHOULD HAVE OPTION TO SELECT LOCATION CODE OR CITY AS INPUT?
+        # OR SHOULD JUST AUTOMATICALLY TRY TO CHECK?
+        filter = input("Enter a pickup location code or city to find ride requests: ")
 
-        viewMode = int(input())
+        # get the ride requests with the inputted pickup location
+        # FIX THIS QUERY WHEN ACTUALLY NOT DYING
+        cursor.execute(''' SELECT DISTINCT requests.rid, requests.email, requests.rdate, requests.pickup,
+                            requests.dropoff, requests.amount
+                            FROM locations, requests
+                            WHERE lcode = ? AND pickup = lcode;''', (filter,))
+        filteredRequests = cursor.fetchall()
+        numRequests = len(filteredRequests)
 
-        if viewMode == 1:
-            getAllRequests(cursor, conn, email)
+        # NEED TO FILTER OUT ONLY 5 PER PAGE????
+
+        if (numRequests == 0):
+            print("There are no ride requests with the given pickup location.")
             break
 
-        elif viewMode == 2:
-            clear()
-            # SHOULD HAVE OPTION TO SELECT LOCATION CODE OR CITY AS INPUT?
-            # OR SHOULD JUST AUTOMATICALLY TRY TO CHECK?
-            filter = input("Enter a pickup location code or city to find ride requests: ")
-
-            # get the ride requests with the inputted pickup location
-            # FIX THIS QUERY WHEN ACTUALLY NOT DYING
-            cursor.execute(''' SELECT DISTINCT lcode FROM locations, requests
-                                WHERE city = ? AND requests.email = ?''', (filter, email))
-            filteredRequests = cursor.fetchall()
-
-            # get number of filteredRequests
-            # TODO: FINISH THIS QUERY PROBABLY??? NOT SURE IF ITS ACTUALLY DONE
-            # PART OF THIS SHOULD BE IN THE ELSE WHILE TRUE COUNTER LOOP!!!!
-            counter = 0
-            cursor.execute(''' SELECT DISTINCT COUNT(requests.*) as num
-                                        FROM rides, requests, locations
-                                        WHERE requests.email = ? AND requests.pickup = ?
-                                        LIMIT ?, 5;''', (email, filter, counter))
-            reqs = cursor.fetchone()
-            numReqs = reqs["num"]
-
-
-            if rides == []:
-                print("No rides matched. Try again?")
-                continue
-
-            else:
-                while True:
-                    if counter < numReqs:
-                        # FIX THIS QUERY LATER I GUESS ????
-                        cursor.execute(''' SELECT DISTINCT COUNT(requests.*) as num
-                                FROM rides, requests, locations
-                                WHERE requests.email = ? AND requests.pickup = ?
-                                LIMIT ?, 5;''', (email, filter, counter))
-
-                    else:
-                        print("END of List")
-
-                    # REWRITE THIS SINCE THIS IS FROM JACOB'S BOOKINGS CRAP
-                    # COULD PUT BOTH STUFF/THINGS INTO SEPARATE FUNCTIONS POTENTIALLY
-                    selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride').upper()
-                    if selectMore == "NEXT":
-                        counter += 5
-                        continue
-                    elif selectMore == "BOOK":
-                        getBookingInfo(loginEmail, userOffers, cursor, conn)
-                    elif selectMore == "EXIT":
-                        break
-                    else:
-                        print('Invalid command entered. Try again')
-
-def deleteRequest(cursor, conn, email):
-    clear()
-    getAllRequests(cursor, conn, email)
-    while True:
-        delete = int(input("Enter the ID of the ride request you wish to delete: "))
-
-        cursor.execute("SELECT rid FROM requests")
-        get = cursor.fetchall()
-        ridNums = set()
-        for tuple in get:
-            if tuple[0] not in ridNums:
-                ridNums.add(tuple[0])
-        # maybe like change this to a set of integers so can find easily
-        if delete in ridNums: # if input is a valid RID then like delete it
-            cursor.execute("DELETE FROM requests WHERE rid = ?", (delete,))
-            conn.commit()
-            print("Ride Request Deleted!")
-            break
         else:
-            print("ID not found. Try a different ID or exit.")
+            print("Ride Requests with Pickup Location: " + filter)
+            print("ID | Date | Pickup | Dropoff | Amount | Poster")
+            for request in filteredRequests:
+                print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
+            print("\n")
+            print("If you wish to message a poster, enter the email of the poster you wish to message.")
+            emailMember = input("Otherwise, enter anything else: ")
+
+            # EMAIL CHECKER NOT WORKING??A?FGSFN?GDGSFDGSFDHGSfdfgfdgn
+            emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
+
+            if emailMember is None:
+                print('Invalid email. Try again?')
+                continue
+            else:
+                break
+                messagePoster(cursor, conn, email, poster)
+                # RIGHT HERE SHOULD BE ABLE TO MESSAGE MEMBER
+
+
+
+        # get number of filteredRequests
+        # TODO: FINISH THIS QUERY PROBABLY??? NOT SURE IF ITS ACTUALLY DONE
+        # PART OF THIS SHOULD BE IN THE ELSE WHILE TRUE COUNTER LOOP!!!!
+        counter = 0
+        cursor.execute(''' SELECT DISTINCT COUNT(requests.*) as num
+                                    FROM rides, requests, locations
+                                    WHERE requests.email = ? AND requests.pickup = ?
+                                    LIMIT ?, 5;''', (email, filter, counter))
+        reqs = cursor.fetchone()
+        numReqs = reqs["num"]
+
+
+        if rides == []:
+            print("No rides matched. Try again?")
             continue
 
-def message(cursor, conn, email):
+        else:
+            while True:
+                if counter < numReqs:
+                    # FIX THIS QUERY LATER I GUESS ????
+                    cursor.execute(''' SELECT DISTINCT COUNT(requests.*) as num
+                            FROM rides, requests, locations
+                            WHERE requests.email = ? AND requests.pickup = ?
+                            LIMIT ?, 5;''', (email, filter, counter))
+
+                else:
+                    print("END of List")
+
+                # REWRITE THIS SINCE THIS IS FROM JACOB'S BOOKINGS CRAP
+                # COULD PUT BOTH STUFF/THINGS INTO SEPARATE FUNCTIONS POTENTIALLY
+                selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride').upper()
+                if selectMore == "NEXT":
+                    counter += 5
+                    continue
+                elif selectMore == "BOOK":
+                    getBookingInfo(loginEmail, userOffers, cursor, conn)
+                elif selectMore == "EXIT":
+                    break
+                else:
+                    print('Invalid command entered. Try again')
+
+def messagePoster(cursor, conn, email, poster):
     clear()
     # EMAILING/MESSAGING BETWEEN MEMBERS???
     # put crap into a table and then like do stuff i guess
     # just INSERT message into the email table
     # and then like have an option to like display the email or whatever i guess
+
+    while True:
+        message = input("Enter the message you wish to send to " + poster + ": ")
+        timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        rno = 0 # NEED TO CHANGE THIS SO CAN GET FROM RIDES RNO SHIT
+        cursor.execute(''' INSERT INTO inbox VALUES (?,?,?,?,?,'n');''', (poster, timeStamp, email, message, rno))
+        conn.commit()
+        print('Message sent!')
+        # values = (str(ride[7]), t, loginEmail, message, str(ride[0]), "n" )
+        # query = "INSERT INTO inbox VALUES(?,?,?,?,?,?);"
+        # runSQL(c, conn, query, values)
+        #print("Message sent!\n")
+        break

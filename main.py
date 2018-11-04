@@ -78,6 +78,7 @@ def main():
         print('2 - Register New User')
         print('3 - Exit Program')
         selection = int(input())
+        clear()
         if selection == 1:
             email = getLogin(cursor, conn)
             break
@@ -134,7 +135,7 @@ def systemFunctionalities(cursor, conn, email):
         print('blaze it')
 
     while True:
-        cont = str(input('Do you want to continue? \n Enter 1 to Continue, otherwise exit/logout: '))
+        cont = str(input('Do you want to continue? \nEnter 1 to Continue, otherwise exit/logout: '))
 
         if cont is '1':
             clear()
