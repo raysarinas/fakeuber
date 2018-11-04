@@ -48,11 +48,19 @@ def postRequest(cursor, conn, email):
             date = datetime.date(year, month, day)
         #print(date)
         #print(type(date))
-        pickup = rides.getLoc(cursor, conn, email).replace("%", "")
+        print("Enter a pickup location code or keyword(s): ")
+        pickup = rides.getLocation(cursor, conn, email) #rides.getLoc(cursor, conn, email).replace("%", "")
         #print(pickup)
-        dropoff = rides.getLoc(cursor, conn, email).replace("%", "")
+        print("Enter a dropoff location code or keyword(s): ")
+        dropoff = rides.getLocation(cursor, conn, email) #rides.getLoc(cursor, conn, email).replace("%", "")
         #print(dropoff)
+
         amount = input('How much are you willing to pay per seat? ')
+
+        while amount.isdigit() == False:
+            amount = input("Invalid input. Enter a numerical amount: ")
+        amount = int(amount)
+
         rid = getReqID(cursor, conn, email)
         cursor.execute('''INSERT INTO requests
                 VALUES (?, ?, ?, ?, ?, ?);''', (rid, email, date, pickup, dropoff, amount))
@@ -118,7 +126,6 @@ def manageYourRequests(cursor, conn, email):
             delCheck = re.match("^[\d]+$", delOption)
 
             if delCheck is None:
-
                 break
 
             else:
