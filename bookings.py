@@ -69,7 +69,7 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
     while True:
         try:
             rno = int(input('Enter Ride #: '))
-            numSeatsBook = int(input('Enter # of seats you want to book: ')) # NEED TO HAVE CHECK ON STRING
+            numSeatsBook = int(input('Enter # of seats you want to book: '))
         except ValueError:
             print('Not a number. Do it again')
             continue
