@@ -47,7 +47,7 @@ def populate(conn, cursor):
 
 def main():
     ''' initialize application or something'''
-
+    clear()
     print('-----------------------------------------------------------')
     print('Welcome to UberLite')
     print('-----------------------------------------------------------')
