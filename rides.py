@@ -5,21 +5,6 @@ import main, login, re
 import time, datetime
 
 def offerRide(cursor, conn, email):
-    '''
-    The member should be able to offer rides by providing a date, the number
-    of seats offered, the price per seat, a luggage description,
-    a source location, and a destination location. The member should have the
-    option of adding a car number and any set of enroute locations. For
-    locations (including source, destination and enroute), the member
-    should be able to provide a keyword, which can be a location code. If the
-    keyword is not a location code, your system should return all locations
-    that have the keyword as a substring in city, province or address fields.
-    If there are more than 5 matching locations, at most 5 matches will be
-    shown at a time, letting the member select a location or see more matches.
-    If a car number is entered, your system must ensure that the car belongs
-    to the member. Your system should automatically assign a unique ride
-    number (rno) to the ride and set the member as the driver of the ride.
-    '''
     #clear()
     print('Offer a ride by entering the following information: ')
 
@@ -66,27 +51,29 @@ def offerRide(cursor, conn, email):
             else:
                 break
 
-        enroutes = []
-        askEnroutes = input("Would you like to add any enroute locations? Enter 'Y' if yes. Otherwise, enter anything else: ")
-
-        if askEnroutes == 'y':
-            while True:
-                print("Enter an enroute location code or keyword: ", end='')
-                enroutes.append(getLocation(cursor))
-                askAgain = input("If you would like to add another enroute location, Enter 'Y'. Otherwise, enter anything else: ")
-                if askAgain != 'y':
-                    break
+        # enroutes = []
+        # askEnroutes = input("Would you like to add any enroute locations? Enter 'Y' if yes. Otherwise, enter anything else: ")
+        #
+        # if askEnroutes == 'y':
+        #     while True:
+        #         print("Enter an enroute location code or keyword: ", end='')
+        #         enroutes.append(getLocation(cursor))
+        #         askAgain = input("If you would like to add another enroute location, Enter 'Y'. Otherwise, enter anything else: ")
+        #         if askAgain != 'y':
+        #             break
 
         rno = getRNO(cursor, conn, email)
         cursor.execute('''INSERT INTO rides
                 VALUES (?,?,?,?,?,?,?,?,?);''', (rno, price, date, seats, luggage, source, dest, email, cno))
         conn.commit()
 
-        enrouteLen = len(enroutes)
-        if enrouteLen > 0:
-            for i in range(enrouteLen):
-                cursor.execute(''' INSERT INTO enroute VALUES (?, ?);''', (rno, enroutes[i]))
-                conn.commit()
+        # enrouteLen = len(enroutes)
+        # if enrouteLen > 0:
+        #     for i in range(enrouteLen):
+        #         cursor.execute(''' INSERT INTO enroute VALUES (?, ?);''', (rno, enroutes[i]))
+        #         conn.commit()
+
+        getEnroutes(cursor, conn, rno)
 
         # @JUJU PLZ CHECK IF THESE VALUES ARE RIGHT LIKE rno ?????
         # IDK IM CONFUSED BUT IT SHOULD WORK
@@ -97,6 +84,30 @@ def offerRide(cursor, conn, email):
         print('Ride Offering Posted!')
 
         break
+
+def getEnroutes(cursor, conn, rno):
+    enroutes = []
+    askEnroutes = input("Would you like to add any enroute locations? Enter 'Y' if yes. Otherwise, enter anything else: ")
+
+    if askEnroutes == 'y':
+        while True:
+            print("Enter an enroute location code or keyword: ", end='')
+            enroutes.append(getLocation(cursor))
+            askAgain = input("If you would like to add another enroute location, Enter 'Y'. Otherwise, enter anything else: ")
+            if askAgain != 'y':
+                break
+
+    # rno = getRNO(cursor, conn, email)
+    # cursor.execute('''INSERT INTO rides
+    #         VALUES (?,?,?,?,?,?,?,?,?);''', (rno, price, date, seats, luggage, source, dest, email, cno))
+    # conn.commit()
+
+    enrouteLen = len(enroutes)
+    if enrouteLen > 0:
+        for i in range(enrouteLen):
+            cursor.execute(''' INSERT INTO enroute VALUES (?, ?);''', (rno, enroutes[i]))
+            conn.commit()
+
 
 
 def getCarNum(cursor, conn, email):
@@ -160,8 +171,10 @@ def getLocation(cursor):
             return selection
 
 def searchRides(cursor, conn, email):
+    cursor.execute(''' SELECT * FROM rides WHERE driver = ?;''', (email,))
+    all = cursor.fetchall()
+    print(all)
 
-    pass
     while True:
         keyIn = input("Enter up to 3 keywords to search rides: ")
         keywords = keyIn.split()
@@ -170,6 +183,12 @@ def searchRides(cursor, conn, email):
             print("Too many or too little keywords! Try again. ")
             continue
 
+        for word in keywords:
+            print(word)
+
+
+
+        break
         # get the ride requests with the inputted pickup location
         # FIX THIS QUERY WHEN ACTUALLY NOT DYING
         cursor.execute(''' SELECT DISTINCT requests.rid, requests.email, requests.rdate, requests.pickup,
