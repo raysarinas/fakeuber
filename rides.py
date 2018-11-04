@@ -140,4 +140,5 @@ def getRideNum(cursor, conn, email):
     rno = last[0] + 1
     return rno
 
-def searchRides(cursor, conn, email)
+def searchRides(cursor, conn, email):
+    pass
