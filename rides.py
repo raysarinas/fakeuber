@@ -5,6 +5,70 @@ import main, login
 #import time, datetime
 
 def offerRide(cursor, conn, email):
+    '''
+    The member should be able to offer rides by providing a date, the number
+    of seats offered, the price per seat, a luggage description,
+    a source location, and a destination location. The member should have the
+    option of adding a car number and any set of enroute locations. For
+    locations (including source, destination and enroute), the member
+    should be able to provide a keyword, which can be a location code. If the
+    keyword is not a location code, your system should return all locations
+    that have the keyword as a substring in city, province or address fields.
+    If there are more than 5 matching locations, at most 5 matches will be
+    shown at a time, letting the member select a location or see more matches.
+    If a car number is entered, your system must ensure that the car belongs
+    to the member. Your system should automatically assign a unique ride
+    number (rno) to the ride and set the member as the driver of the ride.
+    '''
+    clear()
+    print('Offer a ride by entering the following information: ')
+
+    while True:
+        date = input('Ride Date (YYYY-MM-DD)?')
+        dateCheck = re.match("^[\d]{4}\\-[\d]{2}\\-[\d]{2}$", date)
+        if dateCheck is None:
+            print('Invalid Date. Try Again')
+            continue
+        else: # CONVERT TO DATE TYPE
+            year, month, day = map(int, date.split('-'))
+            date = datetime.date(year, month, day)
+
+        numSeats = input("How many seats are you offering? ")
+        validNumSeats(numSeats)
+
+        seatPrice = input("What is the price per seat? ")
+        validSeatPrice(seatPrice)
+
+        luggage = input("Enter luggage description: ") # FIX LUGGAGE DESCRIPTION
+
+        pickup = rides.getLoc(cursor, conn, email).replace("%", "")
+        dropoff = rides.getLoc(cursor, conn, email).replace("%", "")
+
+        carNum = 'NULL' # if did not want to enter a car num
+        askCarNum = input("Would you like to add a car number? [Y/N] ")
+        if askCarNum.lower() == 'y':
+            carNum = getCarNum(cursor, conn, email)
+        else:
+
+
+        rno = getRidNum(cursor, conn, email)
+        cursor.execute('''INSERT INTO requests
+                VALUES (?, ?, ?, ?, ?, ?);''', (rid, email, date, pickup, dropoff, amount))
+        conn.commit()
+
+        print('Ride Request Posted!')
+
+        break
+
+def getRideNum(cursor, conn, email):
+    cursor.execute("SELECT max(rno) from rides")
+    last = cursor.fetchone()
+    if last == None:
+        return 1
+    rno = last[0] + 1
+    return rno
+
+def offerRideOLD(cursor, conn, email):
     date = input("Date of the ride: (YYYY-MM-DD): ")
     if not checkValidDate(date):
         print("Invalid format: PLease try again (YYYY-MM-DD)")
@@ -130,15 +194,6 @@ def getCarNum(cursor, conn, email):
         print("Car is not registered with you, please try again")
         getCarNum(cursor, conn, email)
 
-
-
-def getRideNum(cursor, conn, email):
-    cursor.execute("SELECT max(rno) from rides")
-    last = cursor.fetchone()
-    if last == None:
-        return 1
-    rno = last[0] + 1
-    return rno
 
 def searchRides(cursor, conn, email):
     pass

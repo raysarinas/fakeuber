@@ -37,9 +37,6 @@ def postRequest(cursor, conn, email):
     clear()
     print('Post a Ride Request by entering the following information: ')
 
-    conn.commit()
-
-    counter = 0
     while True:
         date = input('Ride Date (YYYY-MM-DD)?')
         dateCheck = re.match("^[\d]{4}\\-[\d]{2}\\-[\d]{2}$", date)
@@ -125,13 +122,11 @@ def manageYourRequests(cursor, conn, email):
                 break
 
             else:
-                cursor.execute("SELECT rid FROM requests")
+                cursor.execute("SELECT rid FROM requests WHERE email = ?;", (email,))
                 get = cursor.fetchall()
                 ridNums = set()
 
                 for tuple in get:
-                    print(tuple[0])
-                    print(type(tuple[0]))
                     if tuple[0] not in ridNums:
                         ridNums.add(tuple[0])
 
@@ -141,7 +136,7 @@ def manageYourRequests(cursor, conn, email):
                     print("Ride Request Deleted!")
                     break
                 else:
-                    print("ID not found. Try a different ID or exit.")
+                    print("\nID not found. Try a different ID that you have access to or exit.")
                     continue
 
 def searchRequest(cursor, conn, email):
@@ -161,8 +156,7 @@ def searchRequest(cursor, conn, email):
         filteredRequests = cursor.fetchall()
         numRequests = len(filteredRequests)
 
-        # NEED TO FILTER OUT ONLY 5 PER PAGE????
-
+        # TODO:NEED TO FILTER OUT ONLY 5 PER PAGE????
         if (numRequests == 0):
             print("There are no ride requests with the given pickup location.")
             break
@@ -186,56 +180,8 @@ def searchRequest(cursor, conn, email):
                 messagePoster(cursor, conn, email, emailMember)
                 # RIGHT HERE SHOULD BE ABLE TO MESSAGE MEMBER
 
-
-
-        # get number of filteredRequests
-        # TODO: FINISH THIS QUERY PROBABLY??? NOT SURE IF ITS ACTUALLY DONE
-        # PART OF THIS SHOULD BE IN THE ELSE WHILE TRUE COUNTER LOOP!!!!
-        counter = 0
-        cursor.execute(''' SELECT DISTINCT COUNT(requests.*) as num
-                                    FROM rides, requests, locations
-                                    WHERE requests.email = ? AND requests.pickup = ?
-                                    LIMIT ?, 5;''', (email, filter, counter))
-        reqs = cursor.fetchone()
-        numReqs = reqs["num"]
-
-
-        if rides == []:
-            print("No rides matched. Try again?")
-            continue
-
-        else:
-            while True:
-                if counter < numReqs:
-                    # FIX THIS QUERY LATER I GUESS ????
-                    cursor.execute(''' SELECT DISTINCT COUNT(requests.*) as num
-                            FROM rides, requests, locations
-                            WHERE requests.email = ? AND requests.pickup = ?
-                            LIMIT ?, 5;''', (email, filter, counter))
-
-                else:
-                    print("END of List")
-
-                # REWRITE THIS SINCE THIS IS FROM JACOB'S BOOKINGS CRAP
-                # COULD PUT BOTH STUFF/THINGS INTO SEPARATE FUNCTIONS POTENTIALLY
-                selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride').upper()
-                if selectMore == "NEXT":
-                    counter += 5
-                    continue
-                elif selectMore == "BOOK":
-                    getBookingInfo(loginEmail, userOffers, cursor, conn)
-                elif selectMore == "EXIT":
-                    break
-                else:
-                    print('Invalid command entered. Try again')
-
 def messagePoster(cursor, conn, email, poster):
     clear()
-    # EMAILING/MESSAGING BETWEEN MEMBERS???
-    # put crap into a table and then like do stuff i guess
-    # just INSERT message into the email table
-    # and then like have an option to like display the email or whatever i guess
-
     while True:
         message = input("Enter the message you wish to send to " + poster + ": ")
         timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
