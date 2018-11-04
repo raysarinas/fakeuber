@@ -30,9 +30,10 @@ def bookBooking(loginEmail, cursor, conn):
     totalRidesNum = totalRides[0]
     while True:
         if counter < totalRidesNum:
-            cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(b.seats,0) as available
+            cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(SUM(b.seats),0) as available
                                                   FROM bookings b, rides r WHERE driver LIKE ?
                                                   AND b.rno=r.rno
+                                                  GROUP BY r.rno
                                                   LIMIT ?,5;''', (loginEmail,counter))
             userOffers = cursor.fetchall()
             for x in userOffers:
