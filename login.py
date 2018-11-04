@@ -13,11 +13,11 @@ def getLogin(cursor, conn):
 		# User inputs their email
 		email = input('Enter Email:')
 		# Check valid email
-		emailCheck = re.match("^[\\_\d\w]+\\@[\\_\d\w]+\.[\\_\d\w]+$", email)
+		emailCheck = re.match("^[\\_\d\w]+\\@[\\_\d\w]+\\.[\\_\d\w]+$", email)
 		# Get password
 		password = getpass.getpass(prompt="Enter Password: ")
 		# Check valid password
-		passwordCheck = re.match("^[\d\w]+$", password)
+		passwordCheck = re.match("^[\\_\d\w]+$", password)
 		# If both valid, find if exists in table
 		if passwordCheck and emailCheck:
 			cursor.execute('''SELECT * FROM members WHERE email LIKE ? AND pwd=?;''', (email,password))
@@ -63,7 +63,7 @@ def registerNewUser(cursor, conn):
 	# User enters their email
 	while True:
 		email = input('Enter Email: ')
-		emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", email)
+		emailCheck = re.match("^[\\_\d\w]+\\@[\\_\d\w]+\\.[\\_\d\w]+$", email)
 		# Check valid email
 		if emailCheck is None:
 			print('Not an email. Try Again')
@@ -104,7 +104,7 @@ def registerNewUser(cursor, conn):
 	while True:
 		password = getpass.getpass(prompt="Enter Your Password: ")
 		# Check if no password was entered or invalid
-		passwordCheck = re.match("^[_\d\w]+$", password)
+		passwordCheck = re.match("^[\\_\d\w]+$", password)
 		if not password or passwordCheck is None:
 			print('Invalid password. Please enter a password')
 			continue

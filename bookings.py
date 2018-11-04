@@ -54,58 +54,67 @@ def bookBooking(loginEmail, cursor, conn):
             print('Invalid command entered. Try again')
 
 def getBookingInfo(loginEmail, userOffers, cursor, conn):
-    rno, numSeatsBook = 0
-    emailMember, pickUp, dropOff = None
     # User enters ride # they want associated with new booking
+    checkValid = 0
     while True:
         rno = int(input('Enter Ride #: '))
         numSeatsBook = int(input('Enter # of seats you want to book: '))
         for x in userOffers:
-            if rno == x["rno"]:
-                if numSeatsBook > x["available"]:
+            if rno == x[0]:
+                if numSeatsBook > x[9]:
                     print("Warning! There are overbooked seats on this ride")
+                    checkValid +=1
+                checkValid += 1
                 break
-        continue
+        if checkValid > 0:
+            break
+        else:
+            print('Ride is not in current list')
+            continue
 
 	# User enters member's email
     while True:
     	emailMember = input('Enter the email of the member you want to book: ')
-    	emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", email)
+    	emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", emailMember)
     	# Check valid email
     	if emailCheck is None:
     		print('Not an email. Try Again')
     		continue
     	cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (emailMember,))
     	emails = cursor.fetchall()
-    	if emails is None:
+    	if not emails:
     		print('Member does not exist. Use a different email')
     		continue
     	else:
-    		print('Valid email')
     		break
     # Get cost per seat
     costPerSeat = int(input('Enter the cost per seat: '))
     # Get pickup and dropoff location codes
+    goodLCode = 0
     while True:
-        pickUp = input('Enter the pickup location code: ')
-        dropOff = input('Enter the dropoff location code: ')
-        cursor.execute('''SELECT src, dst FROM rides WHERE rno=?''', (rno,))
-        locationCodes = cursor.fetchone()
-        if locationCodes[0] != pickUp:
-            print('Invalid pickup code.')
+        pickUp = input('Enter the pickup location code: ').lower()
+        dropOff = input('Enter the dropoff location code: ').lower()
+        cursor.execute('''SELECT lcode FROM locations''')
+        locationCodes = cursor.fetchall()
+        for x in locationCodes:
+            if x[0] == pickUp:
+                goodLCode +=1
+            if x[0] == dropOff:
+                goodLCode +=1
+        if goodLCode == 2:
+            break
+        else:
+            print('Invalid Location codes entered')
             continue
-        if locationCodes[1] != dropOff:
-            print('Invalid dropoff code.')
-            continue
-        break
 
     cursor.execute('''SELECT MAX(bno)+1 as lastNum FROM bookings''')
     maxBno = cursor.fetchone()
     maxBno = maxBno[0]
     cursor.execute('''INSERT INTO bookings VALUES
                         (?, ?, ?, ?, ?, ?, ?)''',(maxBno, emailMember, rno, costPerSeat, numSeatsBook, pickUp, dropOff))
-    cursor.execute('''INSERT INTO inbox VALUES (?, datetime('now'), 'You have been booked on the following ride'
-                                        , 'n');''', (emailMember, loginEmail, rno))
+    conn.commit()
+    cursor.execute('''INSERT INTO inbox VALUES (?, datetime('now'), ?, 'You have been booked on the following ride'
+                                        , ?, 'n');''', (emailMember, loginEmail, rno))
     conn.commit()
 
 def cancelBooking(loginEmail, cursor, conn):
@@ -126,6 +135,7 @@ def cancelBooking(loginEmail, cursor, conn):
         content = input('Explain reason for cancelation: ')
         cursor.execute('''INSERT INTO inbox VALUES (?,
                           datetime('now'), ?, ?, ?, 'n');''',(cancelSelected[1], loginEmail, content, cancelSelected[2]))
+        conn.commit()
         cursor.execute('''DELETE FROM bookings WHERE bno=?;''', (cancelBno,))
         print('Booking ? has been cancelled. ? will be notified of the cancellation', (cancelBno, cancelSelected[1]))
         conn.commit()
