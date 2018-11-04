@@ -18,9 +18,9 @@ def offerRide(cursor, conn, email):
 
     luggage = input("Enter luggage description: ") #fix luggage desc?????
     print("Source Location")
-    sourceLoc = getLoc(cursor, conn, email)
+    sourceLoc = getLoc(cursor, conn, email).replace("%", "")
     print("Destination Location")
-    destLoc = getLoc(cursor, conn, email)
+    destLoc = getLoc(cursor, conn, email).replace("%", "")
     carNum = 'NULL' #if did not want to enter a car num
     askCarNum = input("Would you like to add a car number? [Y/N]")
     if askCarNum.upper() == 'Y':

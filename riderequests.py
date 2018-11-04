@@ -49,12 +49,12 @@ def postRequest(cursor, conn, email):
         else: # CONVERT TO DATE TYPE
             year, month, day = map(int, date.split('-'))
             date = datetime.date(year, month, day)
-        print(date)
-        print(type(date))
+        #print(date)
+        #print(type(date))
         pickup = rides.getLoc(cursor, conn, email).replace("%", "")
-        print(pickup)
+        #print(pickup)
         dropoff = rides.getLoc(cursor, conn, email).replace("%", "")
-        print(dropoff)
+        #print(dropoff)
         amount = input('How much are you willing to pay per seat? ')
         rid = getReqID(cursor, conn, email)
         cursor.execute('''INSERT INTO requests
@@ -178,7 +178,7 @@ def searchRequest(cursor, conn, email):
             emailMember = input("Otherwise, enter anything else: ")
             emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
 
-            if emailMember is None:
+            if emailCheck is None:
                 print('Invalid email. Try again?')
                 continue
             else:
