@@ -25,6 +25,8 @@ def getReqID(cursor, conn, email):
     rid = int(last[0][0])+ 1
     return rid
 
+
+
 def postRequest(cursor, conn, email):
     '''
     The member should be able to post a ride request by providing a date,
@@ -32,7 +34,7 @@ def postRequest(cursor, conn, email):
     to pay per seat. The request rid is set by your system to a unique number
     and the email is set to the email address of the member.
     '''
-    clear() # do i need to import something so this works or what
+    clear()
     print('Post a Ride Request by entering the following information: ')
 
     conn.commit()
@@ -44,9 +46,15 @@ def postRequest(cursor, conn, email):
         if dateCheck is None:
             print('Invalid Date. Try Again')
             continue
-        # CALL rides.getLocation AS PICKUP AND DROPOFF
-        pickup = rides.getLoc(cursor, conn, email)
-        dropoff = rides.getLoc(cursor, conn, email)
+        else: # CONVERT TO DATE TYPE
+            year, month, day = map(int, date.split('-'))
+            date = datetime.date(year, month, day)
+        print(date)
+        print(type(date))
+        pickup = rides.getLoc(cursor, conn, email).replace("%", "")
+        print(pickup)
+        dropoff = rides.getLoc(cursor, conn, email).replace("%", "")
+        print(dropoff)
         amount = input('How much are you willing to pay per seat? ')
         rid = getReqID(cursor, conn, email)
         cursor.execute('''INSERT INTO requests
@@ -93,17 +101,6 @@ def searchDeleteRequest(cursor, conn, email):
             print('Invalid choice dum dum')
             continue
 
-# def displayUserRequests(cursor, conn, email):
-#     clear()
-#     requests = cursor.fetchall()
-#     if len(requests) == 0:
-#         print('You have no ride requests!')
-#     else:
-#         print("ID | Date | Pickup | Dropoff | Amount")
-#         for request in requests:
-#             print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]))
-#         print("\n")
-
 def manageYourRequests(cursor, conn, email):
     clear()
     while True:
@@ -121,10 +118,10 @@ def manageYourRequests(cursor, conn, email):
             print("\n")
             print("If you wish to delete a ride request, enter the ID of the ride request you wish to delete.")
             delOption = input("Otherwise, enter anything else: ")
-
             delCheck = re.match("^[\d]+$", delOption)
 
             if delCheck is None:
+
                 break
 
             else:
@@ -133,42 +130,19 @@ def manageYourRequests(cursor, conn, email):
                 ridNums = set()
 
                 for tuple in get:
+                    print(tuple[0])
+                    print(type(tuple[0]))
                     if tuple[0] not in ridNums:
                         ridNums.add(tuple[0])
 
-                if delete in ridNums: # if input is a valid RID then like delete it
-                    cursor.execute("DELETE FROM requests WHERE rid = ?", (delete,))
+                if int(delOption) in ridNums: # if input is a valid RID then like delete it
+                    cursor.execute("DELETE FROM requests WHERE rid = ?", (delOption,))
                     conn.commit()
                     print("Ride Request Deleted!")
                     break
                 else:
                     print("ID not found. Try a different ID or exit.")
                     continue
-
-# def deleteRequest(cursor, conn, email):
-#     clear()
-#     #getAllRequests(cursor, conn, email)
-#     while True:
-#
-#         print("Otherwise, enter an")
-#         delete = int(input("Enter the ID of the ride request you wish to delete: "))
-#
-#         cursor.execute("SELECT rid FROM requests")
-#         get = cursor.fetchall()
-#         ridNums = set()
-#         for tuple in get:
-#             if tuple[0] not in ridNums:
-#                 ridNums.add(tuple[0])
-#
-#         if delete in ridNums: # if input is a valid RID then like delete it
-#             cursor.execute("DELETE FROM requests WHERE rid = ?", (delete,))
-#             conn.commit()
-#             print("Ride Request Deleted!")
-#             break
-#         else:
-#             print("ID not found. Try a different ID or exit.")
-#             continue
-
 
 def searchRequest(cursor, conn, email):
     clear()
@@ -199,10 +173,9 @@ def searchRequest(cursor, conn, email):
             for request in filteredRequests:
                 print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
             print("\n")
+
             print("If you wish to message a poster, enter the email of the poster you wish to message.")
             emailMember = input("Otherwise, enter anything else: ")
-
-            # EMAIL CHECKER NOT WORKING??A?FGSFN?GDGSFDGSFDHGSfdfgfdgn
             emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
 
             if emailMember is None:
