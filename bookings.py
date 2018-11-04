@@ -140,7 +140,7 @@ def cancelBooking(loginEmail, cursor, conn):
                               datetime('now'), ?, ?, ?, 'n');''',(cancelSelected[1], loginEmail, content, cancelSelected[2]))
             conn.commit()
             cursor.execute('''DELETE FROM bookings WHERE bno=?;''', (cancelBno,))
-            print('Booking ? has been cancelled. ? will be notified of the cancellation', (cancelBno, cancelSelected[1]))
+            print('Booking', cancelBno, 'has been cancelled.',cancelSelected[1], 'will be notified of the cancellation')
             conn.commit()
             break
     else:
