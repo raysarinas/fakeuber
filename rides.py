@@ -1,8 +1,8 @@
 # 1 - OFFER A RIDE
 # 2 - SEARCH FOR RIDES
 import sqlite3
-import main, login
-#import time, datetime
+import main, login, re
+import time, datetime
 
 def offerRide(cursor, conn, email):
     '''
@@ -20,7 +20,7 @@ def offerRide(cursor, conn, email):
     to the member. Your system should automatically assign a unique ride
     number (rno) to the ride and set the member as the driver of the ride.
     '''
-    clear()
+    #clear()
     print('Offer a ride by entering the following information: ')
 
     while True:
@@ -33,32 +33,46 @@ def offerRide(cursor, conn, email):
             year, month, day = map(int, date.split('-'))
             date = datetime.date(year, month, day)
 
+        # CHECK THE NUMSEATS AND SEATPRICE INPUT HERE IF VALID DIGIT
         numSeats = input("How many seats are you offering? ")
-        validNumSeats(numSeats)
+        price = input("What is the price per seat? ")
 
-        seatPrice = input("What is the price per seat? ")
-        validSeatPrice(seatPrice)
+        while True:
+            luggage = input("Enter luggage description: ")
+            if len(luggage) > 10:
+                print("Please enter a shorter description.")
+                continue
+            else:
+                break
 
-        luggage = input("Enter luggage description: ") # FIX LUGGAGE DESCRIPTION
+        pickup = getLoc(cursor, conn, email).replace("%", "")
+        dropoff = getLoc(cursor, conn, email).replace("%", "")
 
-        pickup = rides.getLoc(cursor, conn, email).replace("%", "")
-        dropoff = rides.getLoc(cursor, conn, email).replace("%", "")
+        while True:
+            carNum = 'NULL' # if did not want to enter a car num
+            askCarNum = input("Would you like to add a car number? Enter 'Y' if yes. Otherwise, enter anything else. ")
+            if askCarNum.lower() == 'y':
+                carNum = getCarNum(cursor, conn, email)
+                break
+            else:
+                break
 
-        carNum = 'NULL' # if did not want to enter a car num
-        askCarNum = input("Would you like to add a car number? [Y/N] ")
-        if askCarNum.lower() == 'y':
-            carNum = getCarNum(cursor, conn, email)
-        else:
-
-
-        rno = getRidNum(cursor, conn, email)
+        rno = getRNO(cursor, conn, email)
         cursor.execute('''INSERT INTO requests
-                VALUES (?, ?, ?, ?, ?, ?);''', (rid, email, date, pickup, dropoff, amount))
+                VALUES (?, ?, ?, ?, ?, ?);''', (rno, email, date, pickup, dropoff, price))
         conn.commit()
 
         print('Ride Request Posted!')
 
         break
+
+def getRNO(cursor, conn, email):
+    cursor.execute(''' SELECT MAX(rides.rno) FROM rides;''')
+    last = cursor.fetchall()
+    if last == None:
+        return 1
+    rno = int(last[0][0])+ 1
+    return rno
 
 def getRideNum(cursor, conn, email):
     cursor.execute("SELECT max(rno) from rides")
@@ -128,6 +142,14 @@ def checkValidDate(date): #fix to check if date is in future
     date1 = date.split('-')
     #print(date1)
     if (len(date1) != 3) or (date[4] != '-') or (date[7] != '-'):
+        return False
+    else:
+        return True
+
+def checkDigit(input):
+    if not input.isdigit():
+        fix = input("Invalid input. Please enter an appropriate number: ")
+        checkDigit(fix)
         return False
     else:
         return True
