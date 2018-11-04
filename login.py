@@ -62,7 +62,7 @@ def registerNewUser(cursor, conn):
 	print('Register a new user')
 	# User enters their email
 	while True:
-		email = input('Enter Email: ')
+		email = input('Enter Email: ').lower()
 		emailCheck = re.match("^[\\_\d\w]+\\@[\\_\d\w]+\\.[\\_\d\w]+$", email)
 		# Check valid email
 		if emailCheck is None:

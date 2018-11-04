@@ -77,7 +77,11 @@ def main():
         print('1 - Login')
         print('2 - Register New User')
         print('3 - Exit Program')
-        selection = int(input())
+        try:
+            selection = int(input())
+        except ValueError:
+            print('Not a number. Do it again')
+            continue
         clear()
         if selection == 1:
             email = getLogin(cursor, conn)
@@ -102,9 +106,12 @@ def systemFunctionalities(cursor, conn, email):
     print('4 - post ride requests')
     print('5 - search and delete ride requests')
     print('6 - exit program and fuck off')
-
-    user_input = int(input())
-
+    while True:
+        try:
+            user_input = int(input())
+        except ValueError:
+            print('Not a number. Do it again')
+            continue
     if (user_input == 1):
         clear()
         print('call offer ride stuff')
