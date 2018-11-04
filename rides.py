@@ -52,10 +52,12 @@ def offerRide(cursor, conn, email):
             luggage = input("Desciption too long. Enter a shorter description: ")
 
         # CHECK LOCATION STUFFFFFFF
-        source = getLocation(cursor, conn, email) #getLoc(cursor, conn, email).replace("%", "")
-        dest = getLocation(cursor, conn, email) #getLoc(cursor, conn, email).replace("%", "")
+        print("Enter a pickup location code or keyword: ", end='')
+        source = getLocation(cursor) #getLoc(cursor, conn, email).replace("%", "")
+        print("Enter a dropoff location code or keyword: ", end='')
+        dest = getLocation(cursor) #getLoc(cursor, conn, email).replace("%", "")
 
-        print("Would you like to add a car number? Enter 'Y' if yes. Otherwise, enter anything else. ")
+        print("Would you like to add a car number? Enter 'Y' if yes. Otherwise, enter anything else. ", end='')
         while True:
             cno = None # OR SHOULD THIS BE NULL????? # if did not want to enter a car num
             askCarNum = input()
@@ -64,21 +66,38 @@ def offerRide(cursor, conn, email):
             else:
                 break
 
-        # while True:
-        #     enroutes = []
-        #     askEnroutes = input("Would you like to add any enroute locations? Enter 'Y' if yes. Otherwise, enter anything else.")
-        #
-        #     while askEnroutes.lower() == 'y':
+        enroutes = []
+        askEnroutes = input("Would you like to add any enroute locations? Enter 'Y' if yes. Otherwise, enter anything else: ")
+
+        if askEnroutes == 'y':
+            while True:
+                print("Enter an enroute location code or keyword: ", end='')
+                enroutes.append(getLocation(cursor))
+                askAgain = input("If you would like to add another enroute location, Enter 'Y'. Otherwise, enter anything else: ")
+                if askAgain != 'y':
+                    break
 
         rno = getRNO(cursor, conn, email)
-
         cursor.execute('''INSERT INTO rides
                 VALUES (?,?,?,?,?,?,?,?,?);''', (rno, price, date, seats, luggage, source, dest, email, cno))
         conn.commit()
 
+        enrouteLen = len(enroutes)
+        if enrouteLen > 0:
+            for i in range(enrouteLen):
+                cursor.execute(''' INSERT INTO enroute VALUES (?, ?);''', (rno, enroutes[i]))
+                conn.commit()
+
+        # @JUJU PLZ CHECK IF THESE VALUES ARE RIGHT LIKE rno ?????
+        # IDK IM CONFUSED BUT IT SHOULD WORK
+        # UNCOMMENT THE NEXT 2 LINES
+        # cursor.execute(''' SELECT * FROM enroute;''')
+        # print(cursor.fetchall())
+
         print('Ride Offering Posted!')
 
         break
+
 
 def getCarNum(cursor, conn, email):
     carNum = input("Enter car number: ")
@@ -87,10 +106,8 @@ def getCarNum(cursor, conn, email):
     carNum = int(carNum)
     cursor.execute("SELECT cno from cars where owner = ? and cno = ?", (email, carNum))
     if cursor.fetchone() == None or cursor.fetchone()[0] != carNum:
-        print("Car is not registered with you, please try again by entering 'Y'. Otherwise, no.")
+        print("Car is not registered with you, please try again by entering 'Y'. Otherwise, no: ", end='')
         carNum = None
-
-        # GET STUCK IN LOOP IF DONT HAVE CAR NUMBER NEED WAY TO BREAK OUT OF IT???
 
 def getRNO(cursor, conn, email):
     cursor.execute(''' SELECT MAX(rides.rno) FROM rides;''')
@@ -99,69 +116,6 @@ def getRNO(cursor, conn, email):
         return 1
     rno = int(last[0][0])+ 1
     return rno
-
-# def getRideNum(cursor, conn, email):
-#     cursor.execute("SELECT max(rno) from rides")
-#     last = cursor.fetchone()
-#     if last == None:
-#         return 1
-#     rno = last[0] + 1
-#     return rno
-
-# def offerRideOLD(cursor, conn, email):
-#     date = input("Date of the ride: (YYYY-MM-DD): ")
-#     if not checkValidDate(date):
-#         print("Invalid format: PLease try again (YYYY-MM-DD)")
-#         offerRide(cursor, conn, email)
-#
-#     numSeats = input("Enter number of seats: ")
-#     validNumSeats(numSeats)
-#
-#     seatPrice = input("Enter price per seat: ")
-#     validSeatPrice(seatPrice)
-#
-#     luggage = input("Enter luggage description: ") #fix luggage desc?????
-#     print("Source Location")
-#     sourceLoc = getLoc(cursor, conn, email).replace("%", "")
-#     print("Destination Location")
-#     destLoc = getLoc(cursor, conn, email).replace("%", "")
-#     carNum = 'NULL' #if did not want to enter a car num
-#     askCarNum = input("Would you like to add a car number? [Y/N]")
-#     if askCarNum.upper() == 'Y':
-#         carNum = getCarNum(cursor, conn, email)
-#
-#     # elif askCarNum.upper() == 'N':
-#     #     enrouteSet = []
-#     #     askEnroute = input("Would you like to add an enroute location? [Y/N]")
-#     #     if askEnroute.upper() == 'Y':
-#     #         addEnroute = getLoc(cursor, conn)
-#     #         enrouteSet.append(addEnroute)
-#     #         askEnrouteAgain = input ("Would you like to add another enroute location? [Y/N] ")
-#
-#     #rideNum = getRideNum(cursor, conn)
-#
-#     enrouteSet = []
-#     askEnroute = input("Would you like to add an enroute location? [Y/N]")
-#     if askEnroute.upper() == 'Y':
-#         addEnroute = getLoc(cursor, conn, email)
-#         enrouteSet.append(addEnroute)
-#         askEnrouteAgain = input ("Would you like to add another enroute location? [Y/N] ")
-#         #if askEnrouteAgain.upper() == 'Y':
-#             #######fix this move this somewhere???
-#     # elif askEnroute.upper() == 'N':
-#     #     return
-#     assignRideNum = getRideNum(cursor, conn, email)
-#     if len(enrouteSet) != 0:
-#         for loc in enrouteSet:
-#             cursor.execute("INSERT INTO enroute values (?, ?)", (assignRideNum, loc))
-#             connection.commit()
-#     cursor.execute("INSERT INTO rides values (?, ?, ?, ?, ?, ?, ?, ?, ?)", (assignRideNum, seatPrice, date, numSeats, luggage, sourceLoc, destLoc, email, carNum))
-#     connection.commit()
-#     askAddAnotherRide = input("Would you like to add another ride? [Y/N] ")
-#     if askAddAnotherRide.upper() == Y:
-#         offer(cursor, connection, email)
-#     return #???????
-
 
 # def checkValidDate(date): #fix to check if date is in future
 #     date = date
@@ -172,10 +126,11 @@ def getRNO(cursor, conn, email):
 #     else:
 #         return True
 
-def getLocation(cursor, conn, email):
+def getLocation(cursor):
     while True:
         location = input().lower() # OR TYPE IN EXIT TO GO BACK?
         # TODO: CHECK TO MAKE SURE LOCATION CODE INPUT IS CORRECT
+        # LOCATION CODE SHOULD HAVE MAX LEN 5 --- Char(5)???
         # if (location == 'EXIT'):
         #     break
 
@@ -187,7 +142,7 @@ def getLocation(cursor, conn, email):
             keyword = '%' + location + '%'
             cursor.execute('''SELECT * FROM locations WHERE (city LIKE ? OR prov LIKE ? OR address LIKE ?);''', (keyword, keyword, keyword))
             locationList = cursor.fetchall()
-            print("Locations with similar keyword(s): ")
+            print("Locations with similar keyword: ")
             print("Code | City | Province | Address")
 
             locationSet = set()
@@ -204,41 +159,46 @@ def getLocation(cursor, conn, email):
 
             return selection
 
-
-
-# def getLoc(cursor, conn, email): #fix so can find location if keyword not a lcode
-#     location = input("Enter a location code or keyword to search: ")
-#     cursor.execute("SELECT city, prov from locations where ? = lcode", (location.lower(),))
-#     location = '%' + location.lower() + '%'
-#     found = cursor.fetchone()
-#     if found != None:
-#         confirm = input("Location " + found[0] + " " + found[1] + ". Is this correct? [Y/N]")
-#         if confirm.upper() == 'Y':
-#             return location.lower()
-#         else:
-#         	return getLoc(cursor, conn, email)
-#     else:
-#         cursor.execute("SELECT * from locations where (city like ? or prov like ? or address like ?) ", (location, location, location))
-#         locSet = cursor.fetchall()
-#         count = 0
-#         loops = 0
-#         for location in locSet:
-#             print("Option " + str(count + 1) + ': ' + location[1] + " " + location[2] + " " + location[3])
-#             if count == 4 or location == locSet[len(locSet) - 1]:
-#                 choice = input("Select one of these locations? (Enter option # or press enter to see more)")
-#                 if choice == '':
-#                     count = -1
-#                     loops +=1
-#                 else:
-#                     try:
-#                         choice = int(choice)
-#                         return locSet[(loops * 4) + (choice - 1)][0]
-#                     except ValueError:
-#                         print("Invalid option. Please retry search.")
-#                         return getLoc(cursor, conn, email)
-#                 count += 1
-#         print("Location not found. Please try another location code or keyword")
-#         return getLoc(cursor, conn, email)
-
 def searchRides(cursor, conn, email):
+
     pass
+    while True:
+        keyIn = input("Enter up to 3 keywords to search rides: ")
+        keywords = keyIn.split()
+
+        if ((len(keywords) > 3) or (len(keywords) == 0)):
+            print("Too many or too little keywords! Try again. ")
+            continue
+
+        # get the ride requests with the inputted pickup location
+        # FIX THIS QUERY WHEN ACTUALLY NOT DYING
+        cursor.execute(''' SELECT DISTINCT requests.rid, requests.email, requests.rdate, requests.pickup,
+                            requests.dropoff, requests.amount
+                            FROM locations, requests
+                            WHERE lcode = ? AND pickup = lcode;''', (filter,))
+        filteredRequests = cursor.fetchall()
+        numRequests = len(filteredRequests)
+
+        # TODO:NEED TO FILTER OUT ONLY 5 PER PAGE????
+        if (numRequests == 0):
+            print("There are no ride requests with the given pickup location.")
+            break
+
+        else:
+            print("Ride Requests with Pickup Location: " + filter)
+            print("ID | Date | Pickup | Dropoff | Amount | Poster")
+            for request in filteredRequests:
+                print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
+            print("\n")
+
+            print("If you wish to message a poster, enter the email of the poster you wish to message.")
+            emailMember = input("Otherwise, enter anything else: ")
+            emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
+
+            if emailCheck is None:
+                print('Invalid email. Try again?')
+                continue
+            else:
+                #break
+                messagePoster(cursor, conn, email, emailMember)
+                # RIGHT HERE SHOULD BE ABLE TO MESSAGE MEMBER

@@ -106,12 +106,13 @@ def systemFunctionalities(cursor, conn, email):
     print('4 - post ride requests')
     print('5 - search and delete ride requests')
     print('6 - exit program and fuck off')
-    while True:
-        try:
-            user_input = int(input())
-        except ValueError:
-            print('Not a number. Do it again')
-            continue
+    # I CHANGED IT BACK BECAUSE IT FUCKED UP EVERYTHING
+    #while True:
+        # try:
+    user_input = int(input())
+        # except ValueError:
+        #     print('Not a number. Do it again')
+        #     continue
     if (user_input == 1):
         clear()
         print('call offer ride stuff')

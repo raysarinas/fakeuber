@@ -48,11 +48,11 @@ def postRequest(cursor, conn, email):
             date = datetime.date(year, month, day)
         #print(date)
         #print(type(date))
-        print("Enter a pickup location code or keyword(s): ")
-        pickup = rides.getLocation(cursor, conn, email) #rides.getLoc(cursor, conn, email).replace("%", "")
+        print("Enter a pickup location code or keyword: ", end='')
+        pickup = rides.getLocation(cursor) #rides.getLoc(cursor, conn, email).replace("%", "")
         #print(pickup)
-        print("Enter a dropoff location code or keyword(s): ")
-        dropoff = rides.getLocation(cursor, conn, email) #rides.getLoc(cursor, conn, email).replace("%", "")
+        print("Enter a dropoff location code or keyword: ", end='')
+        dropoff = rides.getLocation(cursor) #rides.getLoc(cursor, conn, email).replace("%", "")
         #print(dropoff)
 
         amount = input('How much are you willing to pay per seat? ')
@@ -149,7 +149,6 @@ def manageYourRequests(cursor, conn, email):
 def searchRequest(cursor, conn, email):
     clear()
     while True:
-        clear()
         # SHOULD HAVE OPTION TO SELECT LOCATION CODE OR CITY AS INPUT?
         # OR SHOULD JUST AUTOMATICALLY TRY TO CHECK?
         filter = input("Enter a pickup location code or city to find ride requests: ")
