@@ -69,7 +69,7 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
 	# User enters member's email
     while True:
     	emailMember = input('Enter the email of the member you want to book: ')
-    	emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", emailMember)
+    	emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", email)
     	# Check valid email
     	if emailCheck is None:
     		print('Not an email. Try Again')
@@ -111,10 +111,13 @@ def cancelBooking(loginEmail, cursor, conn):
     print('Your Current Bookings:')
     cursor.execute('''SELECT DISTINCT b.* FROM bookings b, rides r WHERE driver LIKE ? AND b.rno=r.rno;''', (loginEmail,))
     userBookings = cursor.fetchall()
-    print(userBookings)
+    if userBookings:
+        print(userBookings)
+    else:
+        print('You have no bookings.')
     while True:
         cancelBno = int(input('Enter the bno of the booking you wish to cancel: '))
-        cursor.execute('''SELECT * FROM bookings where bno=?;''', (cancelBno,))
+        cursor.execute('''SELECT * FROM bookings where bno=? and driver LIKE ?;''', (cancelBno,loginEmail))
         cancelSelected = cursor.fetchone()
         if not cancelSelected:
             print('Booking selected does not exist')
