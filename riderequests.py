@@ -170,33 +170,56 @@ def searchRequest(cursor, conn, email):
         else:
             print("Ride Requests with Pickup Location: " + filter)
             print("ID | Date | Pickup | Dropoff | Amount | Poster")
+            ridSet = set()
+
             for request in filteredRequests:
+                ridSet.add(int(request[0]))
                 print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
             print("\n")
+            print(ridSet)
 
-            print("If you wish to message a poster, enter the email of the poster you wish to message.")
-            emailMember = input("Otherwise, enter anything else: ")
-            emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
+            print("If you wish to message a poster about a ride, enter the ID number of the ride request. ")
+            msgNum = input("Otherwise, enter anything else: ")
+            print("input - " + msgNum)
+            #emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
 
-            if emailCheck is None:
-                print('Invalid email. Try again?')
-                continue
-            else:
-                #break
-                messagePoster(cursor, conn, email, emailMember)
-                # RIGHT HERE SHOULD BE ABLE TO MESSAGE MEMBER
+            while msgNum.isdigit() == False:
+                msgNum = input("Invalid input. Enter a number: ")
+            msgNum = int(msgNum)
+            if msgNum not in ridSet:
+                msgNum = input("ID not in listing. Try again: ")
 
-def messagePoster(cursor, conn, email, poster):
+            cursor.execute(''' SELECT email FROM requests WHERE rid = ?;''', (msgNum,))
+            poster = cursor.fetchone()[0]
+
+
+
+            messagePoster(cursor, conn, email, msgNum, poster)
+
+            # if emailCheck is None:
+            #     print('Invalid email. Try again?')
+            #     continue
+            # else:
+            #     #break
+            #     messagePoster(cursor, conn, email, emailMember)
+            #     # RIGHT HERE SHOULD BE ABLE TO MESSAGE MEMBER
+
+def messagePoster(cursor, conn, email, msgNum, poster):
     clear()
     while True:
-        message = input("Enter the message you wish to send to " + poster + ": ")
+        message = input("Enter the message you wish to send to " + str(poster) + "about ride #" + str(msgNum)+ ": ")
         timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        
+        cursor.execute('''SELECT rides.rno FROM rides, requests
+                        WHERE rides.driver = ? AND rides.driver = requests.email
+                            AND requests.rid = ? AND rides.rdate = requests.rdate
+                            AND rides.src = requests.pickup AND rides.dst = requests.dropoff;''', (poster, msgNum))
+        rnoFetched = cursor.fetchone()
+        print(rnoFetched)
+        print("--------")
+        break
         rno = 0 # NEED TO CHANGE THIS SO CAN GET FROM RIDES RNO SHIT
-        cursor.execute(''' INSERT INTO inbox VALUES (?,?,?,?,?,'n');''', (poster, timeStamp, email, message, rno))
+        cursor.execute(''' INSERT INTO inbox VALUES (?,?,?,?,?,'n');''', (msgNum, timeStamp, email, message, rno))
         conn.commit()
         print('Message sent!')
-        # values = (str(ride[7]), t, loginEmail, message, str(ride[0]), "n" )
-        # query = "INSERT INTO inbox VALUES(?,?,?,?,?,?);"
-        # runSQL(c, conn, query, values)
-        #print("Message sent!\n")
         break
