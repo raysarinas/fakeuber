@@ -23,25 +23,26 @@ def getBookings(loginEmail, cursor, conn):
 def bookBooking(loginEmail, cursor, conn):
     print('Your Rides Offered:')
     counter = 0
-    cursor.execute('''SELECT DISTINCT COUNT(r.*) as total
-                                          FROM bookings b, rides r WHERE driver LIKE ?
-                                          AND b.rno=r.rno''',(loginEmail,))
+    cursor.execute('''SELECT COUNT(*)
+                             FROM bookings b, rides r WHERE driver LIKE ?
+                             AND b.rno=r.rno;''',(loginEmail,))
     totalRides = cursor.fetchone()
-    totalRidesNum = totalRides["total"]
+    totalRidesNum = totalRides[0]
     while True:
         if counter < totalRidesNum:
-            cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(b.seats,0) as available
+            cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(SUM(b.seats),0) as available
                                                   FROM bookings b, rides r WHERE driver LIKE ?
                                                   AND b.rno=r.rno
+                                                  GROUP BY r.rno
                                                   LIMIT ?,5;''', (loginEmail,counter))
             userOffers = cursor.fetchall()
             for x in userOffers:
-                print(x['r.*'], 'Available Seats: ', x['available'])
+                print(x, 'Available Seats: ', x[9])
                 #print('''Price: ? Ride Date: ? Num of seats: ? Source: ? Dest: ? Seats available: ?
                         #''',(x['price'],x['rdate'],x['seats'],x['src'],x['dst'],x['available']))
         else:
             print("End of List")
-        selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride').upper()
+        selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride: ').upper()
         if selectMore == "NEXT":
             counter += 5
             continue
@@ -90,17 +91,17 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
         dropOff = input('Enter the dropoff location code: ')
         cursor.execute('''SELECT src, dst FROM rides WHERE rno=?''', (rno,))
         locationCodes = cursor.fetchone()
-        if locationCodes["src"] != pickUp:
+        if locationCodes[0] != pickUp:
             print('Invalid pickup code.')
             continue
-        if locationCodes["dst"] != dropOff:
+        if locationCodes[1] != dropOff:
             print('Invalid dropoff code.')
             continue
         break
 
     cursor.execute('''SELECT MAX(bno)+1 as lastNum FROM bookings''')
     maxBno = cursor.fetchone()
-    maxBno = maxBno["lastNum"]
+    maxBno = maxBno[0]
     cursor.execute('''INSERT INTO bookings VALUES
                         (?, ?, ?, ?, ?, ?, ?)''',(maxBno, emailMember, rno, costPerSeat, numSeatsBook, pickUp, dropOff))
     cursor.execute('''INSERT INTO inbox VALUES (?, datetime('now'), 'You have been booked on the following ride'
@@ -124,7 +125,7 @@ def cancelBooking(loginEmail, cursor, conn):
             continue
         content = input('Explain reason for cancelation: ')
         cursor.execute('''INSERT INTO inbox VALUES (?,
-                          datetime('now'), ?, ?, ?, 'n');''',(cancelSelected["email"], loginEmail, content, cancelSelected["rno"]))
+                          datetime('now'), ?, ?, ?, 'n');''',(cancelSelected[1], loginEmail, content, cancelSelected[2]))
         cursor.execute('''DELETE FROM bookings WHERE bno=?;''', (cancelBno,))
-        print('Booking ? has been cancelled. ? will be notified of the cancellation', (cancelBno, cancelSelected["email"]))
+        print('Booking ? has been cancelled. ? will be notified of the cancellation', (cancelBno, cancelSelected[1]))
         conn.commit()
