@@ -209,8 +209,8 @@ def searchRequest(cursor, conn, email):
                 print('Invalid email. Try again?')
                 continue
             else:
-                break
-                messagePoster(cursor, conn, email, poster)
+                #break
+                messagePoster(cursor, conn, email, emailMember)
                 # RIGHT HERE SHOULD BE ABLE TO MESSAGE MEMBER
 
 
