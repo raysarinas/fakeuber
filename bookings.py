@@ -14,14 +14,18 @@ def getBookings(loginEmail, cursor, conn):
         except ValueError:
             print('Not a number. Do it again')
             continue
+        # Member wants to book another member on a ride
         if choice == 1:
             bookBooking(loginEmail, cursor, conn)
             break
+        # Member wants to cancel one of their bookings
         elif choice == 2:
             cancelBooking(loginEmail, cursor, conn)
             break
+        # Member wants to go back to main selection screen
         elif choice == 3:
             break
+        # Some other input was entered
         else:
             print('Invalid choice. Do it again')
             continue
@@ -46,19 +50,18 @@ def bookBooking(loginEmail, cursor, conn):
                                                   GROUP BY r.rno
                                                   LIMIT ?,5;''', (loginEmail,counter))
             userOffers = cursor.fetchall()
-            # In the situation where user has offered a ride but has no bookings, this is the only ride they can offer
+            # In the situation where user has offered a ride but has no bookings do a special booking
             if not userOffers:
                 specialBooking(loginEmail, cursor, conn)
-                break
+                break # return to main selection screen or logout
 
 
-
+            # Print out the 5 or less matching rides offered
             print(" RNO | Price | Ride Date | Total Seats | Luggage description | Source | Destination | Driver | CarNum | Available Seats")
             for row in userOffers:
                 print(str(row[0]) + " | " + str(row[1]) + " | " + str(row[2]) + " | " + str(row[3]) + " | ", end='')
                 print(str(row[4]) + " | " + str(row[5]) + " | " + str(row[6]) + " | " + str(row[7]) + " | ", end='')
                 print(str(row[8]) + " | " + str(row[9]))
-                #print(offer)
         # End of list or no rides offered
         else:
             # No rides offered
@@ -69,12 +72,15 @@ def bookBooking(loginEmail, cursor, conn):
             else:
                 print("End of List")
         selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride, "EXIT" to exit this section: ').upper()
+        # Member wants to see next 5 rides they offer
         if selectMore == "NEXT":
             counter += 5
             continue
+        # Member wants to book a member on one of the current 5 or less ride shown
         elif selectMore == "BOOK":
             getBookingInfo(loginEmail, userOffers, cursor, conn)
             break
+        # Member wants to exit
         elif selectMore == "EXIT":
             break
         else:
@@ -82,9 +88,9 @@ def bookBooking(loginEmail, cursor, conn):
 
 def specialBooking(loginEmail, cursor, conn):
     cursor.execute(''' SELECT rides.rno, rides.src, rides.dst, rides.seats FROM rides WHERE driver = ?''', (loginEmail,))
-    #print(cursor.fetchone())
     fetched = cursor.fetchall()
-    ride = fetched[0]
+    ride = fetched[0] # Get the first ride
+    # Assign rno, pickup, dropoff, total seats and max bno for the first ride
     rno = ride[0]
     pickup = ride[1]
     dropoff = ride[2]
@@ -97,10 +103,10 @@ def specialBooking(loginEmail, cursor, conn):
     while True:
         try:
             numSeatsBook = int(input('Enter # of seats you want to book: '))
-        except ValueError:
+        except ValueError: # Value entered was not an integer
             print('Not a number. Do it again')
             continue
-        if numSeatsBook <= 0:
+        if numSeatsBook <= 0: # Negative or 0 was entered, not allowed
             print('Invalid number of seats booked. Try again')
             continue
         # Check for warning of overbooked seats
@@ -128,17 +134,18 @@ def specialBooking(loginEmail, cursor, conn):
     while True:
         try:
             costPerSeat = int(input('Enter the cost per seat (Must be an integer): '))
-        except ValueError:
+        except ValueError: # Value entered was not an integer
             print('Number entered is not an integer. Try Again.')
             continue
-        if costPerSeat > 0:
+        if costPerSeat > 0: # Value entered is not 0 or negative, so good
             break
         else:
             print('Please enter a non-negative value greater than zero')
             continue
+    # Add the booking
     cursor.execute(''' INSERT INTO bookings VALUES (?,?,?,?,?,?,?);''', (maxBno,emailMember,rno,costPerSeat,numSeatsBook,pickup,dropoff))
     conn.commit()
-    print('Booking has been created I guess')
+    print('Booking has been created')
 
 
 def getBookingInfo(loginEmail, userOffers, cursor, conn):
@@ -153,11 +160,11 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
                 goodLCode +=1
             if x[6] == dropOff:
                 goodLCode +=1
-            if goodLCode == 2:
+            if goodLCode == 2: # If we have 2 then both lcodes match a specific ride
                 # Get the rno of this selected lcodes
                 rno = x[0]
                 break
-        if not rno:
+        if not rno: # If we were unable to get a rno, user must try again
             print('Invalid Location codes entered')
             goodLCode = 0
             continue
@@ -240,6 +247,7 @@ def cancelBooking(loginEmail, cursor, conn):
     userBookings = cursor.fetchall()
     # If they have any bookings
     if userBookings:
+        # Print all of their bookings they have
         for row in userBookings:
             print(str(row[0]) + " | " + str(row[1]) + " | " + str(row[2]) + " | " + str(row[3]) + " | ", end='')
             print(str(row[4]) + " | " + str(row[5]) + " | " + str(row[6]))
@@ -249,12 +257,14 @@ def cancelBooking(loginEmail, cursor, conn):
             except ValueError:
                 print('Not a number. Do it again')
                 continue
-
+            # Find the bno that the member wants yo cancel
             cursor.execute('''SELECT * FROM bookings b, rides r where bno=? and b.rno=r.rno and driver LIKE ?;''', (cancelBno,loginEmail))
             cancelSelected = cursor.fetchone()
+            # Check if selected bno exists, if not they have to try again
             if not cancelSelected:
                 print('Booking selected does not exist')
                 continue
+            # Get content of message to send to other member
             content = input('Explain reason for cancelation: ')
             # Send message to member that their booking is cancelled
             cursor.execute('''INSERT INTO inbox VALUES (?,
