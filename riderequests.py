@@ -218,10 +218,8 @@ def searchRequest(cursor, conn, email):
 
                 cursor.execute(''' SELECT email FROM requests WHERE rid = ?;''', (msgNum,))
                 poster = cursor.fetchone()[0]
-
-
-
-        messagePoster(cursor, conn, email, msgNum, poster)
+                messagePoster(cursor, conn, email, msgNum, poster)
+                break
 
             # if emailCheck is None:
             #     print('Invalid email. Try again?')
