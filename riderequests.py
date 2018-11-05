@@ -149,6 +149,7 @@ def manageYourRequests(cursor, conn, email):
 def searchRequest(cursor, conn, email):
     clear()
     sentMessage = 0
+    exitWanted = 0
     while True:
         # SHOULD HAVE OPTION TO SELECT LOCATION CODE OR CITY AS INPUT?
         # OR SHOULD JUST AUTOMATICALLY TRY TO CHECK?
@@ -206,6 +207,7 @@ def searchRequest(cursor, conn, email):
                     # msgNum = input("Invalid input. Enter a number: ")
                 if msgNum.isdigit() == False:
                     if msgNum == 'EXIT':
+                        exitWanted = 1
                         break
                     else:
                         continue
@@ -222,10 +224,9 @@ def searchRequest(cursor, conn, email):
                 poster = cursor.fetchone()[0]
                 messagePoster(cursor, conn, email, msgNum, poster)
                 sentMessage = 1
-                print('Your message has been sent!')
                 break
-        if sentMessage == 1:
-            break    
+        if sentMessage == 1 or exitWanted == 1:
+            break
             # if emailCheck is None:
             #     print('Invalid email. Try again?')
             #     continue
@@ -238,7 +239,6 @@ def messagePoster(cursor, conn, email, msgNum, poster):
     clear()
     while True:
         message = input("Enter the message you wish to send to " + str(poster) + " about ride #" + str(msgNum)+ ": ")
-        timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
         cursor.execute('''SELECT rides.rno FROM rides, requests
                         WHERE requests.email = ?
@@ -248,11 +248,9 @@ def messagePoster(cursor, conn, email, msgNum, poster):
 
         if rnoFetched == None:
             print('No rides available matching this request. Enter something ')
-        print(rnoFetched)
         print("--------")
-        break
-        rno = 0 # NEED TO CHANGE THIS SO CAN GET FROM RIDES RNO SHIT
-        cursor.execute(''' INSERT INTO inbox VALUES (?,?,?,?,?,'n');''', (msgNum, timeStamp, email, message, rno))
+        rno = rnoFetched[0]
+        cursor.execute(''' INSERT INTO inbox VALUES (?,datetime('now'),?,?,?,'n');''', (poster, email, message, rno))
         conn.commit()
         print('Message sent!')
         break

@@ -11,7 +11,7 @@ def getLogin(cursor, conn):
 
 	while True:
 		# User inputs their email
-		email = input('Enter Email:')
+		email = input('Enter Email:').lower()
 		# Check valid email
 		emailCheck = re.match("^[\\_\d\w]+\\@[\\_\d\w]+\\.[\\_\d\w]+$", email)
 		# Get password

@@ -28,6 +28,7 @@ def getBookings(loginEmail, cursor, conn):
 def bookBooking(loginEmail, cursor, conn):
     print('Your Rides Offered:')
     counter = 0
+    userOffers = None
     # Get number of rides the logged in user offers
     cursor.execute('''SELECT COUNT(*)
                              FROM bookings b, rides r WHERE driver LIKE ?
@@ -50,6 +51,8 @@ def bookBooking(loginEmail, cursor, conn):
         # End of list or no rides offered
         else:
             print("End of List")
+        if userOffers is None:
+            break
         selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride, "EXIT" to exit this section: ').upper()
         if selectMore == "NEXT":
             counter += 5
@@ -76,10 +79,8 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
             if x[6] == dropOff:
                 goodLCode +=1
             if goodLCode == 2:
-                print(x[0])
                 # Get the rno of this selected lcodes
                 rno = x[0]
-                print(rno)
                 break
         if not rno:
             print('Invalid Location codes entered')
@@ -138,7 +139,7 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
                         (?, ?, ?, ?, ?, ?, ?)''',(maxBno, emailMember, rno, costPerSeat, numSeatsBook, pickUp, dropOff))
     conn.commit()
     # Send message to member that they have been booked on this ride
-    content = 'You have been booked on ride' + str(rno) + 'by' + loginEmail
+    content = 'You have been booked on ride ' + str(rno) + ' by ' + loginEmail
     cursor.execute('''INSERT INTO inbox VALUES (?, datetime('now'), ?, ?, ?, 'n');''', (emailMember, loginEmail, content, rno))
     conn.commit()
     print(emailMember, 'has been booked on ride #', rno)
