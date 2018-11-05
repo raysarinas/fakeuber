@@ -8,6 +8,7 @@ from bookings import *
 from riderequests import *
 from login import *
 from clear import clear
+import re
 
 connection = None
 cursor = None
@@ -21,7 +22,13 @@ def exitProgram(conn):
 def main():
     # initialize everything i guess
     clear()
-    db = input('Enter a database to use (with .db extension): ') #"./uberDB.db"
+    print('Enter a database to use (with .db extension): ')
+    db = input('Otherwise, exit program: ') #"./uberDB.db"
+    dbCheck = re.match("^[\\_\d\w]+\\.db$", db)
+    if dbCheck is None:
+        print("BYE I GUESS")
+        exit()
+
     #db = './uberDB.db'
     check = os.path.isfile(db)
     conn = sqlite3.connect(db) # creates or opens a db in that path
@@ -111,7 +118,7 @@ def systemFunctionalities(cursor, conn, email):
             # otherwise, log out
             logout()
 
-def logout():
+def logout(check):
     # log out just jumps out and restarts program
     main()
 

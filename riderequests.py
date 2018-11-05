@@ -40,8 +40,8 @@ def postRequest(cursor, conn, email):
             pickup = input("Enter a pickup location code or keyword: ")
             pickup = rides.getLocation(cursor, pickup)
 
-        dest = None
-        while dest is None:
+        dropoff = None
+        while dropoff is None:
             dropoff = input("Enter a dropoff location code or keyword: ")
             dropoff = rides.getLocation(cursor, dropoff)
 
