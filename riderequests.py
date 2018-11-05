@@ -186,10 +186,11 @@ def searchRequest(cursor, conn, email):
         counter = 0
         filteredRequestsNum = len(filteredRequests)
         while True:
-            request = filteredRequests[counter]
-            ridSet.add(int(request[0]))
-            print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
-            if filteredRequestsNum > counter:
+            if counter < filteredRequestsNum:
+                request = filteredRequests[counter]
+                ridSet.add(int(request[0]))
+                print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
+            # if filteredRequestsNum > counter:
                 counter += 1
 
             if counter % 5 == 0 or counter == filteredRequestsNum:
