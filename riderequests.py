@@ -195,7 +195,7 @@ def searchRequest(cursor, conn, email):
                     print('End of the list')
                 print("If you wish to message a poster about a ride, enter the ID number of the ride request. ")
                 msgNum = input("Enter 'EXIT' to exit the search. Otherwise, enter anything else to see next 5: ").upper()
-                print("input - " + msgNum)
+                #print("input - " + msgNum)
                 #emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
 
                 # while msgNum.isdigit() == False:

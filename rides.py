@@ -203,74 +203,69 @@ def searchRides(cursor, conn, email):
     while True:
         keyIn = input("Enter up to 3 keywords to search rides: ")
         keywords = keyIn.split()
-        locList = []
 
         while (len(keywords) > 3 and length > 0):
             less = input("Enter less keywords. Try again: ")
             keywords = less.split()
 
         locationSet = keyWordLocations(cursor, keywords)
+        locList = list(locationSet)
 
-        # CHECK IF SET IS EMPTY
-        if not locationSet:
+        # CHECK IF LIST IS EMPTY
+        if len(locList) == 0:
             print("There are no rides associated with the provided keywords.")
             break
-
         # ELSE IF NOT EMPTY THEN DO SHIT
         else:
-            cursor.execute(''' SELECT DISTINCT requests.rid, requests.email, requests.rdate, requests.pickup,
-                                requests.dropoff, requests.amount
-                                FROM locations, requests
-                                WHERE city LIKE ?;''', (filter,))
+            rnoSet = set()
+            for location in locList:
+                # QUERY SO THAT
+                cursor.execute(''' SELECT DISTINCT rides.rno
+                                    FROM rides, enroute
+                                    WHERE src = ? OR dst = ?
+                                    OR (enroute.lcode = ? AND rides.rno = enroute.rno);''', (location, location, location))
+                rnoFetched = cursor.fetchall()
 
+                for tup in rnoFetched:
+                    if tup[0] not in rnoSet:
+                        rnoSet.add(tup[0])
 
-        # for word in keywords:
-        #     loc = getLocation(cursor, word)
+        rnoList = sorted(rnoSet)
+        print(rnoList)
+        outputList = []
 
+        for rno in rnoList:
+            cursor.execute(''' SELECT DISTINCT rides.*, cars.*
+                                FROM rides
+                                LEFT JOIN cars on rides.cno = cars.cno
+                                WHERE rno = ?''', (rno,))
+            outputList.append(cursor.fetchone())
 
+        print("Rides with matching to entered keywords: ")
+        print("ID | Price | Date | Seats | Luggage Description | Source | Destination | Driver | CarNum | Make | Model | Year | Seats | Owner")
 
+        for row in outputList:
+            print(str(row[0]) + " | " + str(row[1]) + " | " + str(row[2]) + " | " + str(row[3]) + " | ", end='')
+            print(str(row[4]) + " | " + str(row[5]) + " | " + str(row[6]) + " | " + str(row[7]) + " | ", end='')
+            print(str(row[8]) + " | " + str(row[9]) + " | " + str(row[10]) + " | " + str(row[11]) + " | ", end='')
+            print(str(row[12]) + " | " + str(row[13]))
 
-        # if ((len(keywords) > 3) or (len(keywords) == 0)):
-        #     print("Too many or too little keywords!")
-        #     break
-        #
-        # for word in keywords:
-        #     loc = getLocation(cursor, word)
+        print("If you wish to message a poster about a ride, enter the ID number of the ride. ")
+        rnoInput = input("enter 'EXIT' to exit the search. Otherwise, enter anything else: ").upper()
 
+        while rnoInput.isdigit() == False:
+            rnoInput = input("try again dumbass: ")
 
+        rnoInput = int(rnoInput)
 
+        cursor.execute(''' SELECT driver FROM rides WHERE rno = ?;''', (rnoInput,))
+        driver = cursor.fetchone()[0]
+        print(driver)
+        messageDriver(cursor, conn, email, rnoInput, driver)
+        # JUJU IMPLEMENT ASKING WHAT TO DO NEXT
 
-
+def messageDriver(cursor, conn, email, rno, driver):
+    clear()
+    while True:
+        print('your message to ' + str(driver) + ' is: sup bitch')
         break
-        # get the ride requests with the inputted pickup location
-        # FIX THIS QUERY WHEN ACTUALLY NOT DYING
-        cursor.execute(''' SELECT DISTINCT requests.rid, requests.email, requests.rdate, requests.pickup,
-                            requests.dropoff, requests.amount
-                            FROM locations, requests
-                            WHERE lcode = ? AND pickup = lcode;''', (filter,))
-        filteredRequests = cursor.fetchall()
-        numRequests = len(filteredRequests)
-
-        # TODO:NEED TO FILTER OUT ONLY 5 PER PAGE????
-        if (numRequests == 0):
-            print("There are no ride requests with the given pickup location.")
-            break
-
-        else:
-            print("Ride Requests with Pickup Location: " + filter)
-            print("ID | Date | Pickup | Dropoff | Amount | Poster")
-            for request in filteredRequests:
-                print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
-            print("\n")
-
-            print("If you wish to message a poster, enter the email of the poster you wish to message.")
-            emailMember = input("Otherwise, enter anything else: ")
-            emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
-
-            if emailCheck is None:
-                print('Invalid email. Try again?')
-                continue
-            else:
-                #break
-                messagePoster(cursor, conn, email, emailMember)
-                # RIGHT HERE SHOULD BE ABLE TO MESSAGE MEMBER
