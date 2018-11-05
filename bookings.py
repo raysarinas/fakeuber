@@ -50,6 +50,7 @@ def bookBooking(loginEmail, cursor, conn):
                                                   GROUP BY r.rno
                                                   LIMIT ?,5;''', (loginEmail,counter))
             userOffers = cursor.fetchall()
+            # ASSUMPTION:
             # In the situation where user has offered a ride but has no bookings do a special booking
             if not userOffers:
                 print('You currently have no bookings. Let us make a new one')
@@ -277,5 +278,5 @@ def cancelBooking(loginEmail, cursor, conn):
             print('Booking', cancelBno, 'has been cancelled.',cancelSelected[1], 'will be notified of the cancellation')
             conn.commit()
             break
-    else:
+    else: # If userBookings is empty, then the member offers no rides
         print('You have no bookings.')
