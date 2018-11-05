@@ -1,7 +1,5 @@
 # 3 - BOOK MEMBERS OR CANCEL BOOKINGS
-'''
-https://stackoverflow.com/questions/26451888/sqlite-get-x-rows-then-next-x-rows
-'''
+
 import re
 from clear import clear
 def getBookings(loginEmail, cursor, conn):
@@ -48,7 +46,7 @@ def bookBooking(loginEmail, cursor, conn):
                                                   GROUP BY r.rno
                                                   LIMIT ?,5;''', (loginEmail,counter))
             userOffers = cursor.fetchall()
-
+            # In the situation where user has offered a ride but has no bookings, this is the only ride they can offer
             if not userOffers:
                 specialBooking(loginEmail, cursor, conn)
                 break
