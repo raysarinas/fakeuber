@@ -111,31 +111,6 @@ def getEnroutes(cursor, conn, rno):
             cursor.execute(''' INSERT INTO enroute VALUES (?, ?);''', (rno, enroutes[i]))
             conn.commit()
 
-# def getCarNum(cursor, conn, email):
-#     # get the car number for user
-#     carNum = input("Enter car number: ")
-#     while carNum.isdigit() == False:
-#         carNum = getCarNum(cursor, conn, email)
-#
-#     carNum = int(carNum)
-#
-#     cursor.execute("SELECT cno from cars where owner = ? and cno = ?", (email, carNum))
-#     cnoFetched = cursor.fetchone()[0]
-#     print(type(cnoFetched))
-#     print(" ------ TEST ----- " + str(cnoFetched))
-#     ''' OPTION TO SAY CANT OFFER A RIDE IF HAVE NO CAR ???????????
-#         CANT ADD A CNO BECAUSE CANT OFFER A RIDE IF NO CAR AND IF NO CAR CANT ADD CNO
-#         EGOUBHDGSNAFML;SDNGPIFARWKFEGWRHETOJW[ADKS'F;ET]WR[GHETRW]
-#     '''
-#
-#     if cursor.fetchone() == None: # or cnoFetched != carNum:
-#         askAgain = input("Car is not registered with you, please try again by entering 'Y'. Otherwise, no: ")
-#         if askAgain.lower() == 'y':
-#             getCarNum(cursor, conn, email)
-#         else:
-#             return None
-#     else:
-#         return cnoFetched
 
 def getRNO(cursor, conn, email):
     # create a new RNO for new rides to be offered by taking maximum number already
@@ -189,60 +164,23 @@ def getLocation(cursor, location):
 
             while True:
                 if counter < locListLen:
-                    location = locList[counter]
+                    location = locList[counter] # Get the current index of the list
                     # display locations onto screen
                     print(str(location[0]) + " | " + str(location[1]) + " | " + str(location[2]) + " | " + str(location[3]))
                     counter += 1
-
+                # If we have print 5 or at the end of list notify
                 if counter % 5 == 0 or counter == locListLen:
                     if counter == locListLen:
                         print('End of the list')
                     print("Select one of the above locations by entering the appropriate location code")
                     selection = input("Otherwise, anything else will show the next 5: ").lower()
-                    if selection not in locationSet:
+                    if selection not in locationSet: # See next 5
                         print('Next 5')
                         continue
 
                     return selection
 
 
-# def getLocationEnroutes(cursor, location):
-#     while True:
-#         location = location.lower()
-#         #location = input().lower() # OR TYPE IN EXIT TO GO BACK?
-#         # TODO: CHECK TO MAKE SURE LOCATION CODE INPUT IS CORRECT
-#         # LOCATION CODE SHOULD HAVE MAX LEN 5 --- Char(5)???
-#         # if (location == 'EXIT'):
-#         #     break
-#
-#         cursor.execute('''SELECT city, prov FROM locations WHERE lcode = ? ;''', (location,))
-#         found = cursor.fetchone()
-#         if found != None:
-#             return location
-#         else:
-#             keyword = '%' + location + '%'
-#             cursor.execute('''SELECT * FROM locations WHERE (lcode LIKE ? OR city LIKE ? OR prov LIKE ? OR address LIKE ?);''', (keyword, keyword, keyword, keyword))
-#             locationList = cursor.fetchall()
-#             print("Locations with similar keyword: ")
-#             print("Code | City | Province | Address")
-#
-#             locationSet = set()
-#             for location in locationList:
-#                 # NEED 5 PER PAGE FILTER HERE @JACKIE
-#                 if location[0] not in locationSet:
-#                     locationSet.add(str(location[0]))
-#
-#             if not locationSet:
-#                 print('No locations found with that keyword. Try again. ')
-#                 break
-#             for location in locationList:
-#                 print(str(location[0]) + " | " + str(location[1]) + " | " + str(location[2]) + " | " + str(location[3]))
-#
-#             selection = input("Select one of the above locations by entering the appropriate location code: ").lower()
-#             if selection not in locationSet:
-#                 selection = input("Try again and enter an appropriate location code: ").lower()
-#
-#             return selection
 
 def keyWordLocations(cursor, keywords):
     # specifically for when searching rides, if multiple keywords are entered,
@@ -322,20 +260,20 @@ def searchRides(cursor, conn, email):
         exitWanted = 0
         while True:
             if counter < outputListLen:
-                row = outputList[counter]
+                row = outputList[counter] # Show current index of our list
                 print(str(row[0]) + " | " + str(row[1]) + " | " + str(row[2]) + " | " + str(row[3]) + " | ", end='')
                 print(str(row[4]) + " | " + str(row[5]) + " | " + str(row[6]) + " | " + str(row[7]) + " | ", end='')
                 print(str(row[8]) + " | " + str(row[9]) + " | " + str(row[10]) + " | " + str(row[11]) + " | ", end='')
                 print(str(row[12]) + " | " + str(row[13]))
                 counter += 1
-
+            # Check if 5th index or end of the list
             if counter % 5 == 0 or counter == outputListLen:
                 if counter == outputListLen:
                     print('End of the list')
 
                 print("If you wish to message a poster about a ride, enter the ID number of the ride. ")
                 rnoInput = input("enter 'EXIT' to exit the search. Otherwise, enter anything else to see next 5: ").upper()
-
+                # Check command/what to do if string was entered
                 if rnoInput.isdigit() == False:
                     if rnoInput == 'EXIT':
                         exitWanted = 1
@@ -344,16 +282,16 @@ def searchRides(cursor, conn, email):
                         continue
                 else:
                     rnoInput = int(rnoInput)
-
+                    # Get the email of the driver for the ride
                     cursor.execute(''' SELECT driver FROM rides WHERE rno = ?;''', (rnoInput,))
                     driver = cursor.fetchone()[0]
-                    print(driver)
+                    # Send a message to the driver
                     messageDriver(cursor, conn, email, rnoInput, driver)
                     sentMessage = 1
                     break
+        # Break if a message was sent or we want to exit
         if sentMessage == 1 or exitWanted == 1:
             break
-        # JUJU IMPLEMENT ASKING WHAT TO DO NEXT
 
 def messageDriver(cursor, conn, email, rno, driver):
     # message the driver

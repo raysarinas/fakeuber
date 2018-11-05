@@ -187,19 +187,15 @@ def searchRequest(cursor, conn, email):
                 request = filteredRequests[counter]
                 ridSet.add(int(request[0]))
                 print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
-            # if filteredRequestsNum > counter:
-                counter += 1
 
+                counter += 1
+            # Mod 5 will say we have reach 5th entry or equal to length means end of list
             if counter % 5 == 0 or counter == filteredRequestsNum:
                 if counter == filteredRequestsNum:
                     print('End of the list')
                 print("If you wish to message a poster about a ride, enter the ID number of the ride request. ")
                 msgNum = input("Enter 'EXIT' to exit the search. Otherwise, enter anything else to see next 5: ").upper()
-                #print("input - " + msgNum)
-                #emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
-
-                # while msgNum.isdigit() == False:
-                    # msgNum = input("Invalid input. Enter a number: ")
+                # Check which command to do next
                 if msgNum.isdigit() == False:
                     if msgNum == 'EXIT':
                         exitWanted = 1
@@ -207,6 +203,7 @@ def searchRequest(cursor, conn, email):
                     else:
                         continue
                 else:
+                    # Ask again if the id entered is not in the set
                     while True:
                         msgNum = int(msgNum)
                         if msgNum not in ridSet:
@@ -214,12 +211,13 @@ def searchRequest(cursor, conn, email):
                             continue
                         else:
                             break
-
+                # Get the email of the person who posted the request
                 cursor.execute(''' SELECT email FROM requests WHERE rid = ?;''', (msgNum,))
                 poster = cursor.fetchone()[0]
                 messagePoster(cursor, conn, email, msgNum, poster)
                 sentMessage = 1
                 break
+        # Exit if exit chosen or a message was sent
         if sentMessage == 1 or exitWanted == 1:
             break
 
