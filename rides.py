@@ -331,5 +331,8 @@ def searchRides(cursor, conn, email):
 def messageDriver(cursor, conn, email, rno, driver):
     clear()
     while True:
-        print('your message to ' + str(driver) + ' is: sup bitch')
+        message = input("Enter the message you wish to send to " + str(driver) + " about ride with RNO #" + str(rno) + ": ")
+        cursor.execute(''' INSERT INTO inbox VALUES (?,datetime('now'),?,?,?,'n');''', (driver, email, message, rno))
+        conn.commit()
+        print('Message sent!')
         break
