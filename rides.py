@@ -244,24 +244,43 @@ def searchRides(cursor, conn, email):
         print("Rides with matching to entered keywords: ")
         print("ID | Price | Date | Seats | Luggage Description | Source | Destination | Driver | CarNum | Make | Model | Year | Seats | Owner")
 
-        for row in outputList:
-            print(str(row[0]) + " | " + str(row[1]) + " | " + str(row[2]) + " | " + str(row[3]) + " | ", end='')
-            print(str(row[4]) + " | " + str(row[5]) + " | " + str(row[6]) + " | " + str(row[7]) + " | ", end='')
-            print(str(row[8]) + " | " + str(row[9]) + " | " + str(row[10]) + " | " + str(row[11]) + " | ", end='')
-            print(str(row[12]) + " | " + str(row[13]))
+        outputListLen = len(outputList)
+        counter = 0
+        sentMessage = 0
+        exitWanted = 0
+        while True:
+            if counter < outputListLen:
+                row = outputList[counter]
+                print(str(row[0]) + " | " + str(row[1]) + " | " + str(row[2]) + " | " + str(row[3]) + " | ", end='')
+                print(str(row[4]) + " | " + str(row[5]) + " | " + str(row[6]) + " | " + str(row[7]) + " | ", end='')
+                print(str(row[8]) + " | " + str(row[9]) + " | " + str(row[10]) + " | " + str(row[11]) + " | ", end='')
+                print(str(row[12]) + " | " + str(row[13]))
+                counter += 1
 
-        print("If you wish to message a poster about a ride, enter the ID number of the ride. ")
-        rnoInput = input("enter 'EXIT' to exit the search. Otherwise, enter anything else: ").upper()
+            if counter % 5 == 0 or counter == outputListLen:
+                if counter == outputListLen:
+                    print('End of the list')
 
-        while rnoInput.isdigit() == False:
-            rnoInput = input("try again dumbass: ")
+                print("If you wish to message a poster about a ride, enter the ID number of the ride. ")
+                rnoInput = input("enter 'EXIT' to exit the search. Otherwise, enter anything else to see next 5: ").upper()
 
-        rnoInput = int(rnoInput)
+                if rnoInput.isdigit() == False:
+                    if rnoInput == 'EXIT':
+                        exitWanted = 1
+                        break
+                    else:
+                        continue
+                else:
+                    rnoInput = int(rnoInput)
 
-        cursor.execute(''' SELECT driver FROM rides WHERE rno = ?;''', (rnoInput,))
-        driver = cursor.fetchone()[0]
-        print(driver)
-        messageDriver(cursor, conn, email, rnoInput, driver)
+                    cursor.execute(''' SELECT driver FROM rides WHERE rno = ?;''', (rnoInput,))
+                    driver = cursor.fetchone()[0]
+                    print(driver)
+                    messageDriver(cursor, conn, email, rnoInput, driver)
+                    sentMessage = 1
+                    break
+        if sentMessage == 1 or exitWanted == 1:
+            break
         # JUJU IMPLEMENT ASKING WHAT TO DO NEXT
 
 def messageDriver(cursor, conn, email, rno, driver):
