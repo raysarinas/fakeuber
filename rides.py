@@ -61,6 +61,7 @@ def offerRide(cursor, conn, email):
                 break
 
         rno = getRNO(cursor, conn, email)
+        #TODO: FIX: ERROR WHEN BLANK INPUT
         cursor.execute('''INSERT INTO rides
                 VALUES (?,?,?,?,?,?,?,?,?);''', (rno, price, date, seats, luggage, source, dest, email, cno))
         conn.commit()
@@ -148,7 +149,7 @@ def getLocation(cursor, location):
             return location
         else:
             keyword = '%' + location + '%'
-            cursor.execute('''SELECT * FROM locations WHERE (city LIKE ? OR prov LIKE ? OR address LIKE ?);''', (keyword, keyword, keyword))
+            cursor.execute('''SELECT * FROM locations WHERE (lcode LIKE ? OR city LIKE ? OR prov LIKE ? OR address LIKE ?);''', (keyword, keyword, keyword, keyword))
             locationList = cursor.fetchall()
             print("Locations with similar keyword: ")
             print("Code | City | Province | Address")
@@ -176,6 +177,12 @@ def searchRides(cursor, conn, email):
         keyIn = input("Enter up to 3 keywords to search rides: ")
         keywords = keyIn.split()
         locList = []
+
+        while (len(keyWords) > 3 and length > 0):
+            less = input("Enter less keywords. Try again: ")
+            keywords = less.split()
+
+
 
         if ((len(keywords) > 3) or (len(keywords) == 0)):
             print("Too many or too little keywords!")
