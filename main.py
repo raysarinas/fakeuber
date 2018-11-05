@@ -8,7 +8,7 @@ from rides import *
 from bookings import *
 from riderequests import *
 from login import *
-from clear import clear # IMPORT CLEAR FROM HERE INSTEAD OF HAVING IT IN MAIN
+from clear import clear
 
 connection = None
 cursor = None
@@ -100,33 +100,27 @@ def main():
     exitProgram(conn) # close the database? exit program
 
 def systemFunctionalities(cursor, conn, email):
-    print('Watcha wanna do? Enter a number below I guess')
+    print('-----------------------------------------------------------')
+    print('Watcha wanna do? Enter a number below to continue or anything else to exit')
     print('1 - offer a ride')
     print('2 - search for rides')
     print('3 - book members or cancel bookings')
     print('4 - post ride requests')
     print('5 - search and delete ride requests')
-    print('6 - exit program and fuck off')
-    # I CHANGED IT BACK BECAUSE IT FUCKED UP EVERYTHING
-    #while True:
-        # try:
+    print('6 - log out')
+
     user_input = int(input())
-        # except ValueError:
-        #     print('Not a number. Do it again')
-        #     continue
+
     if (user_input == 1):
         clear()
-        print('call offer ride stuff')
         offerRide(cursor, conn, email)
 
     if (user_input == 2):
         clear()
-        print('search for rides')
         searchRides(cursor, conn, email)
 
     if (user_input == 3):
         clear()
-        print('booking shit')
         getBookings(email, cursor, conn)
 
     if (user_input == 4):
@@ -138,7 +132,8 @@ def systemFunctionalities(cursor, conn, email):
         searchDeleteRequest(cursor, conn, email)
 
     if (user_input == 6):
-        exitProgram(conn)
+        logout()
+        #exitProgram(conn)
 
     if (user_input == 420):
         print('blaze it')
@@ -149,8 +144,11 @@ def systemFunctionalities(cursor, conn, email):
         if cont is '1':
             clear()
             systemFunctionalities(cursor, conn, email)
-        else: # REPLACE THIS WITH LOG OUT FUNCTION
-            exitProgram(conn)
+        else:
+            logout()
+
+def logout():
+    main()
 
 if __name__ == "__main__":
     main()

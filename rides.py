@@ -43,22 +43,29 @@ def offerRide(cursor, conn, email):
         dest = getLocation2(cursor, dest) #getLoc(cursor, conn, email).replace("%", "")
 
         askCarNum = input("Would you like to add a car number? Enter 'Y' if yes. Otherwise, enter anything else: ")
-        while askCarNum.lower() == 'y':
-            cno = input("Enter your car number: ")
-            while cno.isdigit() == False:
-                cno = input("That's not a number try again: ")
-            cno = int(cno)
-            #print("input cno: " + str(type(cno)) + " " + str(cno))
-            cursor.execute("SELECT cno FROM cars WHERE owner = ? AND cno = ?;", (email, cno))
 
-            cnoFetched = cursor.fetchone()
-            #print("fetched cno: " + str(type(cnoFetched)) + " " + str(cnoFetched))
-            if (cnoFetched == None):
-                cnoFetched = input("Car is not registered with you; try again by entering 'Y', otherwise enter anything else: ")
-            else:
-                cno = cnoFetched[0]
-                print("Car number registered!")
-                break
+        cursor.execute("SELECT cno FROM cars WHERE owner = ?;", (email,))
+        print(cursor.fetchall())
+        if not cursor.fetchall():
+            print("You don't have any cars registered with you! So bye")
+            cno = None
+        else:
+            while askCarNum.lower() == 'y':
+                cno = input("Enter your car number: ")
+                while cno.isdigit() == False:
+                    cno = input("That's not a number try again: ")
+                cno = int(cno)
+                #print("input cno: " + str(type(cno)) + " " + str(cno))
+                cursor.execute("SELECT cno FROM cars WHERE owner = ? AND cno = ?;", (email, cno))
+
+                cnoFetched = cursor.fetchone()
+                #print("fetched cno: " + str(type(cnoFetched)) + " " + str(cnoFetched))
+                if (cnoFetched == None):
+                    cnoFetched = input("Car is not registered with you; try again by entering 'Y', otherwise enter anything else: ")
+                else:
+                    cno = cnoFetched[0]
+                    print("Car number registered!")
+                    break
 
         rno = getRNO(cursor, conn, email)
         #TODO: FIX: ERROR WHEN BLANK INPUT

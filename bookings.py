@@ -3,6 +3,7 @@
 https://stackoverflow.com/questions/26451888/sqlite-get-x-rows-then-next-x-rows
 '''
 import re
+from clear import clear
 def getBookings(loginEmail, cursor, conn):
     print('Offer/Cancel a Booking')
     print('-----------------------------------------------------------')
@@ -34,23 +35,89 @@ def bookBooking(loginEmail, cursor, conn):
     userOffers = None
     # Get number of rides the logged in user offers
     cursor.execute('''SELECT COUNT(*)
-                             FROM bookings b, rides r WHERE driver LIKE ?
-                             AND b.rno=r.rno;''',(loginEmail,))
+                             FROM rides r WHERE driver LIKE ?;''',(loginEmail,))
     totalRides = cursor.fetchone()
     totalRidesNum = totalRides[0]
+    print(totalRidesNum)
     while True:
         # If we are not at past the length of our list
         if counter < totalRidesNum:
             # Select 5 rides offered and available seats per ride
             cursor.execute('''SELECT DISTINCT r.*, r.seats-IFNULL(SUM(b.seats),0) as available
                                                   FROM bookings b, rides r WHERE driver LIKE ?
-                                                  AND b.rno=r.rno
+                                                  AND r.rno = b.rno
                                                   GROUP BY r.rno
                                                   LIMIT ?,5;''', (loginEmail,counter))
             userOffers = cursor.fetchall()
+
+            if not userOffers:
+                cursor.execute(''' SELECT rides.rno, rides.src, rides.dst, rides.seats FROM rides WHERE driver = ?''', (loginEmail,))
+                #print(cursor.fetchone())
+                fetched = cursor.fetchall()
+                ride = fetched[0]
+                rno = ride[0]
+                pickup = ride[1]
+                dropoff = ride[2]
+                seats = int(ride[3])
+                print(ride)
+                print('test')
+                cursor.execute('''SELECT MAX(bno)+1 as lastNum FROM bookings''')
+                maxBno = cursor.fetchone()
+                maxBno = maxBno[0]
+                # Get number of seats they want booked
+                checkValid = 0
+                while True:
+                    try:
+                        numSeatsBook = int(input('Enter # of seats you want to book: '))
+                    except ValueError:
+                        print('Not a number. Do it again')
+                        continue
+                    if numSeatsBook <= 0:
+                        print('Invalid number of seats booked. Try again')
+                        continue
+                    # Check for warning of overbooked seats
+                    if numSeatsBook > seats:
+                        print("Warning! There are overbooked seats on this ride")
+                    break
+
+            	# User enters member's email
+                while True:
+                	emailMember = input('Enter the email of the member you want to book: ').lower()
+                	emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", emailMember)
+                	# Check valid email
+                	if emailCheck is None:
+                		print('Not an email. Try Again')
+                		continue
+                    # Check is member exists
+                	cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (emailMember,))
+                	emails = cursor.fetchall()
+                	if not emails:
+                		print('Member does not exist. Use a different email')
+                		continue
+                	else:
+                		break
+                # Get cost per seat
+                while True:
+                    try:
+                        costPerSeat = int(input('Enter the cost per seat (Must be an integer): '))
+                    except ValueError:
+                        print('Number entered is not an integer. Try Again.')
+                        continue
+                    if costPerSeat > 0:
+                        break
+                    else:
+                        print('Please enter a non-negative value greater than zero')
+                        continue
+                cursor.execute(''' INSERT INTO bookings VALUES (?,?,?,?,?,?,?);''', (maxBno,emailMember,rno,costPerSeat,numSeatsBook,pickup,dropoff))
+
+
+
             print(" RNO | Price | Ride Date | Total Seats | Luggage description | Source | Destination | Driver | CarNum | Available Seats")
-            for x in userOffers:
-                print(x)
+            for row in userOffers:
+                print(str(row[0]) + " | " + str(row[1]) + " | " + str(row[2]) + " | " + str(row[3]) + " | ", end='')
+                print(str(row[4]) + " | " + str(row[5]) + " | " + str(row[6]) + " | " + str(row[7]) + " | ", end='')
+                print(str(row[8]) + " | " + str(row[9]))
+                #print(offer)
         # End of list or no rides offered
         else:
             # No rides offered
@@ -162,6 +229,7 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
     content = 'You have been booked on ride ' + str(rno) + ' by ' + loginEmail
     cursor.execute('''INSERT INTO inbox VALUES (?, datetime('now'), ?, ?, ?, 'n');''', (emailMember, loginEmail, content, rno))
     conn.commit()
+    clear()
     print(emailMember, 'has been booked on ride #', rno)
 
 def cancelBooking(loginEmail, cursor, conn):
@@ -192,6 +260,7 @@ def cancelBooking(loginEmail, cursor, conn):
             conn.commit()
             # Delete selected booking
             cursor.execute('''DELETE FROM bookings WHERE bno=?;''', (cancelBno,))
+            clear()
             print('Booking', cancelBno, 'has been cancelled.',cancelSelected[1], 'will be notified of the cancellation')
             conn.commit()
             break

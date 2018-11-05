@@ -3,20 +3,13 @@
 
 import re, rides, datetime, time
 from os import system, name
+from clear import clear
 
-def clear():
-    if name == 'nt':
-        _ = system('cls')
-    else:
-        _ = system('clear')
-
-''' could potentially combine the ride request functions into
-    one function and like just have different options for functionalities
-    like in Kathleen's code? with home function in requests.py '''
-
-
-# COMBINE getRideNum and getReqID into one function that takes
-# the table as another parameter so dont have too much redundant code?
+# def clear():
+#     if name == 'nt':
+#         _ = system('cls')
+#     else:
+#         _ = system('clear')
 def getReqID(cursor, conn, email):
     cursor.execute(''' SELECT MAX(requests.rid) FROM requests;''')
     last = cursor.fetchall()
