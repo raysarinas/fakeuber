@@ -53,9 +53,13 @@ def bookBooking(loginEmail, cursor, conn):
                 print(x)
         # End of list or no rides offered
         else:
-            print("End of List")
-        if userOffers is None:
-            break
+            # No rides offered
+            if userOffers is None:
+                print('You are not currently offering any rides')
+                break
+            # End of the list
+            else:
+                print("End of List")
         selectMore = input('Enter "NEXT" to see more rides, "BOOK" to book a member on your ride, "EXIT" to exit this section: ').upper()
         if selectMore == "NEXT":
             counter += 5
