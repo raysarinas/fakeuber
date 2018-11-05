@@ -151,7 +151,7 @@ def searchRequest(cursor, conn, email):
     while True:
         # SHOULD HAVE OPTION TO SELECT LOCATION CODE OR CITY AS INPUT?
         # OR SHOULD JUST AUTOMATICALLY TRY TO CHECK?
-        filter = input("Enter a pickup location code or city to find ride requests: ")
+        filter = input("Enter a pickup location code or city to find ride requests: ").lower()
 
         # get the ride requests with the inputted pickup location
         # FIX THIS QUERY WHEN ACTUALLY NOT DYING
@@ -167,7 +167,7 @@ def searchRequest(cursor, conn, email):
             allLocations = cursor.fetchall()
             locationSet = set()
             for location in allLocations:
-                locationSet.add(location[0])
+                locationSet.add(location[0].lower())
 
             if filter not in locationSet:
                 print("There are no ride requests with the given pickup location.")
@@ -177,7 +177,7 @@ def searchRequest(cursor, conn, email):
                 cursor.execute(''' SELECT DISTINCT requests.rid, requests.email, requests.rdate, requests.pickup,
                                     requests.dropoff, requests.amount
                                     FROM locations, requests
-                                    WHERE city = ?;''', (filter,))
+                                    WHERE city LIKE ?;''', (filter,))
                 filteredRequests = cursor.fetchall()
 
         print("Ride Requests with Pickup Location: " + filter)
@@ -194,7 +194,7 @@ def searchRequest(cursor, conn, email):
                 counter += 1
 
             if counter % 5 == 0 or counter == filteredRequestsNum:
-                if counter == filteredRequests:
+                if counter == filteredRequestsNum:
                     print('End of the list')
                 print("If you wish to message a poster about a ride, enter the ID number of the ride request. ")
                 msgNum = input("Enter 'EXIT' to exit the search. Otherwise, enter anything else to see next 5: ").upper()
