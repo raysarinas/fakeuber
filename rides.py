@@ -245,10 +245,6 @@ def keyWordLocations(cursor, keywords):
 
 
 def searchRides(cursor, conn, email):
-    cursor.execute(''' SELECT * FROM rides WHERE driver = ?;''', (email,))
-    all = cursor.fetchall()
-    print(all)
-
     while True:
         keyIn = input("Enter up to 3 keywords to search rides: ")
         keywords = keyIn.split()
@@ -281,7 +277,6 @@ def searchRides(cursor, conn, email):
                         rnoSet.add(tup[0])
 
         rnoList = sorted(rnoSet)
-        print(rnoList)
         outputList = []
 
         for rno in rnoList:
