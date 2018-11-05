@@ -107,6 +107,10 @@ def getCarNum(cursor, conn, email):
     cnoFetched = cursor.fetchone()[0]
     print(type(cnoFetched))
     print(" ------ TEST ----- " + str(cnoFetched))
+    ''' OPTION TO SAY CANT OFFER A RIDE IF HAVE NO CAR ???????????
+        CANT ADD A CNO BECAUSE CANT OFFER A RIDE IF NO CAR AND IF NO CAR CANT ADD CNO
+        EGOUBHDGSNAFML;SDNGPIFARWKFEGWRHETOJW[ADKS'F;ET]WR[GHETRW]
+    '''
 
     if cursor.fetchone() == None: # or cnoFetched != carNum:
         askAgain = input("Car is not registered with you, please try again by entering 'Y'. Otherwise, no: ")
@@ -168,6 +172,29 @@ def getLocation(cursor, location):
 
             return selection
 
+def keyWordLocations(cursor, keywords):
+    locationSet = set()
+
+    for word in keywords:
+        word = '%' + word.lower() + '%'
+        cursor.execute('''SELECT * FROM locations WHERE (lcode LIKE ? OR city LIKE ? OR prov LIKE ? OR address LIKE ?);''', (word, word, word, word))
+        locationList = cursor.fetchall()
+
+        for location in locationList:
+            # MAYBE NEED 5 PER PAGE FILTER HERE @JACKIE
+            if location[0] not in locationSet:
+                locationSet.add(str(location[0]))
+            # print(str(location[0]) + " | " + str(location[1]) + " | " + str(location[2]) + " | " + str(location[3]))
+
+    return locationSet
+
+        # selection = input("Select one of the above locations by entering the appropriate location code: ").lower()
+        # if selection not in locationSet:
+        #     selection = input("Try again and enter an appropriate location code: ").lower()
+        #
+        # return selection
+
+
 def searchRides(cursor, conn, email):
     cursor.execute(''' SELECT * FROM rides WHERE driver = ?;''', (email,))
     all = cursor.fetchall()
@@ -178,19 +205,38 @@ def searchRides(cursor, conn, email):
         keywords = keyIn.split()
         locList = []
 
-        while (len(keyWords) > 3 and length > 0):
+        while (len(keywords) > 3 and length > 0):
             less = input("Enter less keywords. Try again: ")
             keywords = less.split()
 
+        locationSet = keyWordLocations(cursor, keywords)
 
-
-        if ((len(keywords) > 3) or (len(keywords) == 0)):
-            print("Too many or too little keywords!")
+        # CHECK IF SET IS EMPTY
+        if not locationSet:
+            print("There are no rides associated with the provided keywords.")
             break
 
-        for word in keywords:
-            loc = getLocation
-            print(word)
+        # ELSE IF NOT EMPTY THEN DO SHIT
+        else:
+            cursor.execute(''' SELECT DISTINCT requests.rid, requests.email, requests.rdate, requests.pickup,
+                                requests.dropoff, requests.amount
+                                FROM locations, requests
+                                WHERE city LIKE ?;''', (filter,))
+
+
+        # for word in keywords:
+        #     loc = getLocation(cursor, word)
+
+
+
+
+        # if ((len(keywords) > 3) or (len(keywords) == 0)):
+        #     print("Too many or too little keywords!")
+        #     break
+        #
+        # for word in keywords:
+        #     loc = getLocation(cursor, word)
+
 
 
 

@@ -83,13 +83,12 @@ def searchDeleteRequest(cursor, conn, email):
     clear()
     print('''Ride Request Management''')
     print('-----------------------------------------------------------')
-    print("1 - Manage Your Ride Requests")
+    print("1 - View/Delete Your Ride Requests")
     print("2 - Search Ride Requests")
-    print("3 - Message Posting Member")
-    print("4 - Go Back")
+    print("3 - Go Back")
 
     while True:
-        selection = input('Please enter 1, 2, 3, or 4: ')
+        selection = input('Please enter 1, 2, or 3: ')
         if selection == '1':
             manageYourRequests(cursor, conn, email)
             break
@@ -97,10 +96,6 @@ def searchDeleteRequest(cursor, conn, email):
             searchRequest(cursor, conn, email)
             break
         elif selection == '3':
-            print('default will message to don@mayor.yeg because cant test out otherwise?')
-            messagePoster(cursor, conn, email, 'don@mayor.yeg')
-            break
-        elif selection == '4':
             break
         else:
             print('Invalid choice dum dum')
@@ -245,6 +240,13 @@ def messagePoster(cursor, conn, email, msgNum, poster):
                             AND requests.rid = ? AND rides.rdate = requests.rdate
                             AND rides.src = requests.pickup AND rides.dst = requests.dropoff;''', (poster, msgNum))
         rnoFetched = cursor.fetchone()
+
+        # if rnoFetched is not None:
+        #     rno = rnoFetched[0]
+        #     cursor.execute BLAH BLAH BLAH
+        #     COMMIT AWDSGFHGNFGSAsdgfng
+        # else:
+        #     print("NO RIDES AVAILABSEOGFGB ")
 
         if rnoFetched == None:
             print('No rides available matching this request. Enter something ')
