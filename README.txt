@@ -3,6 +3,8 @@ Raymond Sarinas - rsarinas
 Melisse Doroteo - doroteo
 Jacob Wong - jdw2
 
+rsarinas collaborated with Mohammad Kebbi (kebbi)
+
 References used:
 --------------------------------------------------------------------------------------------------
 WAITING FOR USER INPUT
