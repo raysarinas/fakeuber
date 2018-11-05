@@ -237,7 +237,7 @@ def messagePoster(cursor, conn, email, msgNum, poster):
         timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
         cursor.execute('''SELECT rides.rno FROM rides, requests
-                        WHERE rides.driver = ? AND rides.driver = requests.email
+                        WHERE requests.email = ?
                             AND requests.rid = ? AND rides.rdate = requests.rdate
                             AND rides.src = requests.pickup AND rides.dst = requests.dropoff;''', (poster, msgNum))
         rnoFetched = cursor.fetchone()
