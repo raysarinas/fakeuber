@@ -38,7 +38,6 @@ def bookBooking(loginEmail, cursor, conn):
                              FROM rides r WHERE driver LIKE ?;''',(loginEmail,))
     totalRides = cursor.fetchone()
     totalRidesNum = totalRides[0]
-    print(totalRidesNum)
     while True:
         # If we are not at past the length of our list
         if counter < totalRidesNum:
@@ -51,64 +50,7 @@ def bookBooking(loginEmail, cursor, conn):
             userOffers = cursor.fetchall()
 
             if not userOffers:
-                cursor.execute(''' SELECT rides.rno, rides.src, rides.dst, rides.seats FROM rides WHERE driver = ?''', (loginEmail,))
-                #print(cursor.fetchone())
-                fetched = cursor.fetchall()
-                ride = fetched[0]
-                rno = ride[0]
-                pickup = ride[1]
-                dropoff = ride[2]
-                seats = int(ride[3])
-                cursor.execute('''SELECT MAX(bno)+1 as lastNum FROM bookings''')
-                maxBno = cursor.fetchone()
-                maxBno = maxBno[0]
-                # Get number of seats they want booked
-                checkValid = 0
-                while True:
-                    try:
-                        numSeatsBook = int(input('Enter # of seats you want to book: '))
-                    except ValueError:
-                        print('Not a number. Do it again')
-                        continue
-                    if numSeatsBook <= 0:
-                        print('Invalid number of seats booked. Try again')
-                        continue
-                    # Check for warning of overbooked seats
-                    if numSeatsBook > seats:
-                        print("Warning! There are overbooked seats on this ride")
-                    break
-
-            	# User enters member's email
-                while True:
-                	emailMember = input('Enter the email of the member you want to book: ').lower()
-                	emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", emailMember)
-                	# Check valid email
-                	if emailCheck is None:
-                		print('Not an email. Try Again')
-                		continue
-                    # Check is member exists
-                	cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (emailMember,))
-                	emails = cursor.fetchall()
-                	if not emails:
-                		print('Member does not exist. Use a different email')
-                		continue
-                	else:
-                		break
-                # Get cost per seat
-                while True:
-                    try:
-                        costPerSeat = int(input('Enter the cost per seat (Must be an integer): '))
-                    except ValueError:
-                        print('Number entered is not an integer. Try Again.')
-                        continue
-                    if costPerSeat > 0:
-                        break
-                    else:
-                        print('Please enter a non-negative value greater than zero')
-                        continue
-                cursor.execute(''' INSERT INTO bookings VALUES (?,?,?,?,?,?,?);''', (maxBno,emailMember,rno,costPerSeat,numSeatsBook,pickup,dropoff))
-                conn.commit()
-                print('Booking has been created I guess')
+                specialBooking(loginEmail, cursor, conn)
                 break
 
 
@@ -139,6 +81,66 @@ def bookBooking(loginEmail, cursor, conn):
             break
         else:
             print('Invalid command entered. Try again')
+
+def specialBooking(loginEmail, cursor, conn):
+    cursor.execute(''' SELECT rides.rno, rides.src, rides.dst, rides.seats FROM rides WHERE driver = ?''', (loginEmail,))
+    #print(cursor.fetchone())
+    fetched = cursor.fetchall()
+    ride = fetched[0]
+    rno = ride[0]
+    pickup = ride[1]
+    dropoff = ride[2]
+    seats = int(ride[3])
+    cursor.execute('''SELECT MAX(bno)+1 as lastNum FROM bookings''')
+    maxBno = cursor.fetchone()
+    maxBno = maxBno[0]
+    # Get number of seats they want booked
+    checkValid = 0
+    while True:
+        try:
+            numSeatsBook = int(input('Enter # of seats you want to book: '))
+        except ValueError:
+            print('Not a number. Do it again')
+            continue
+        if numSeatsBook <= 0:
+            print('Invalid number of seats booked. Try again')
+            continue
+        # Check for warning of overbooked seats
+        if numSeatsBook > seats:
+            print("Warning! There are overbooked seats on this ride")
+        break
+
+    # User enters member's email
+    while True:
+        emailMember = input('Enter the email of the member you want to book: ').lower()
+        emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\.[_\d\w]+$", emailMember)
+        # Check valid email
+        if emailCheck is None:
+            print('Not an email. Try Again')
+            continue
+        # Check is member exists
+        cursor.execute('SELECT * FROM members WHERE email LIKE ?;', (emailMember,))
+        emails = cursor.fetchall()
+        if not emails:
+            print('Member does not exist. Use a different email')
+            continue
+        else:
+            break
+    # Get cost per seat
+    while True:
+        try:
+            costPerSeat = int(input('Enter the cost per seat (Must be an integer): '))
+        except ValueError:
+            print('Number entered is not an integer. Try Again.')
+            continue
+        if costPerSeat > 0:
+            break
+        else:
+            print('Please enter a non-negative value greater than zero')
+            continue
+    cursor.execute(''' INSERT INTO bookings VALUES (?,?,?,?,?,?,?);''', (maxBno,emailMember,rno,costPerSeat,numSeatsBook,pickup,dropoff))
+    conn.commit()
+    print('Booking has been created I guess')
 
 
 def getBookingInfo(loginEmail, userOffers, cursor, conn):
