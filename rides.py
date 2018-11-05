@@ -38,9 +38,9 @@ def offerRide(cursor, conn, email):
 
         # CHECK LOCATION STUFFFFFFF
         source = input("Enter a pickup location code or keyword: ")
-        source = getLocation(cursor, source) #getLoc(cursor, conn, email).replace("%", "")
+        source = getLocation2(cursor, source) #getLoc(cursor, conn, email).replace("%", "")
         dest = input("Enter a dropoff location code or keyword: ")
-        dest = getLocation(cursor, dest) #getLoc(cursor, conn, email).replace("%", "")
+        dest = getLocation2(cursor, dest) #getLoc(cursor, conn, email).replace("%", "")
 
         askCarNum = input("Would you like to add a car number? Enter 'Y' if yes. Otherwise, enter anything else: ")
         while askCarNum.lower() == 'y':
@@ -157,20 +157,34 @@ def getLocation2(cursor, location):
             locationList = cursor.fetchall()
             print("Locations with similar keyword: ")
             print("Code | City | Province | Address")
-
             locationSet = set()
             for location in locationList:
                 # NEED 5 PER PAGE FILTER HERE @JACKIE
                 if location[0] not in locationSet:
                     locationSet.add(str(location[0]))
 
-                print(str(location[0]) + " | " + str(location[1]) + " | " + str(location[2]) + " | " + str(location[3]))
+            locList = locationList
+            locListLen = len(locList)
+            counter = 0
+            gotLocation = 0
+            exitWanted = 0
+            while True:
+                if counter < locListLen:
+                    location = locList[counter]
+                    print(str(location[0]) + " | " + str(location[1]) + " | " + str(location[2]) + " | " + str(location[3]))
+                    counter += 1
 
-            selection = input("Select one of the above locations by entering the appropriate location code: ").lower()
-            if selection not in locationSet:
-                selection = input("Try again and enter an appropriate location code: ").lower()
+                if counter % 5 == 0 or counter == locListLen:
+                    if counter == locListLen:
+                        print('End of the list')
+                    print("Select one of the above locations by entering the appropriate location code")
+                    selection = input("Otherwise, anything else will show the next 5: ").lower()
+                    if selection not in locationSet:
+                        # selection = input("Try again and enter an appropriate location code: ").lower()
+                        print('Next 5')
+                        continue
 
-            return selection
+                    return selection
 
 
 def getLocation(cursor, location):
