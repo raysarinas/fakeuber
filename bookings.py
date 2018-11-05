@@ -103,6 +103,9 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
         except ValueError:
             print('Not a number. Do it again')
             continue
+        if numSeatsBook <= 0:
+            print('Invalid number of seats booked. Try again')
+            continue
         # Find corresponding rno
         for x in userOffers:
             if rno == x[0]:
@@ -135,7 +138,17 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
     	else:
     		break
     # Get cost per seat
-    costPerSeat = int(input('Enter the cost per seat: '))
+    while True:
+        try:
+            costPerSeat = int(input('Enter the cost per seat (Must be an integer): '))
+        except ValueError:
+            print('Number entered is not an integer. Try Again.')
+            continue
+        if costPerSeat > 0:
+            break
+        else:
+            print('Please enter a non-negative value greater than zero')
+            continue
 
     # Get highest bno in bookings. Plus 1 would represent a unique bno
     cursor.execute('''SELECT MAX(bno)+1 as lastNum FROM bookings''')
