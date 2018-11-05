@@ -253,8 +253,9 @@ def searchRides(cursor, conn, email):
         keyIn = input("Enter up to 3 keywords to search rides: ")
         keywords = keyIn.split()
 
-        while (len(keywords) > 3 and length > 0):
-            less = input("Enter less keywords. Try again: ")
+        while (len(keywords) > 3 or len(keywords) < 1):
+
+            less = input("Enter different ammount of keywords. Try again: ")
             keywords = less.split()
 
         locationSet = keyWordLocations(cursor, keywords)
