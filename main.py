@@ -13,15 +13,6 @@ from clear import clear
 connection = None
 cursor = None
 
-'''
-WAITING FOR USER INPUT
- https://www.quora.com/How-do-you-make-a-command-to-wait-for-the-user-to-press-ENTER-in-
-Clear command window
- https://www.geeksforgeeks.org/clear-screen-python/
-Checking if database exists or not
- https://stackoverflow.com/questions/12932607/how-to-check-if-a-sqlite3-database-exists-in-python
-'''
-
 # def clear():
 #     if name == 'nt':
 #         _ = system('cls')
