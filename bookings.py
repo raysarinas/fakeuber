@@ -59,8 +59,6 @@ def bookBooking(loginEmail, cursor, conn):
                 pickup = ride[1]
                 dropoff = ride[2]
                 seats = int(ride[3])
-                print(ride)
-                print('test')
                 cursor.execute('''SELECT MAX(bno)+1 as lastNum FROM bookings''')
                 maxBno = cursor.fetchone()
                 maxBno = maxBno[0]
@@ -108,7 +106,11 @@ def bookBooking(loginEmail, cursor, conn):
                     else:
                         print('Please enter a non-negative value greater than zero')
                         continue
+                print(maxBno,emailMember,rno,costPerSeat,numSeatsBook,pickup,dropoff)
                 cursor.execute(''' INSERT INTO bookings VALUES (?,?,?,?,?,?,?);''', (maxBno,emailMember,rno,costPerSeat,numSeatsBook,pickup,dropoff))
+                conn.commit()
+                print('Booking has been created I guess')
+                break
 
 
 
@@ -239,8 +241,9 @@ def cancelBooking(loginEmail, cursor, conn):
     userBookings = cursor.fetchall()
     # If they have any bookings
     if userBookings:
-        for x in userBookings:
-            print(x)
+        for row in userBookings:
+            print(str(row[0]) + " | " + str(row[1]) + " | " + str(row[2]) + " | " + str(row[3]) + " | ", end='')
+            print(str(row[4]) + " | " + str(row[5]) + " | " + str(row[6]))
         while True:
             try:
                 cancelBno = int(input('Enter the bno of the booking you wish to cancel: '))
