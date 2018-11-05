@@ -241,18 +241,12 @@ def messagePoster(cursor, conn, email, msgNum, poster):
                             AND rides.src = requests.pickup AND rides.dst = requests.dropoff;''', (poster, msgNum))
         rnoFetched = cursor.fetchone()
 
-        # if rnoFetched is not None:
-        #     rno = rnoFetched[0]
-        #     cursor.execute BLAH BLAH BLAH
-        #     COMMIT AWDSGFHGNFGSAsdgfng
-        # else:
-        #     print("NO RIDES AVAILABSEOGFGB ")
-
-        if rnoFetched == None:
-            print('No rides available matching this request. Enter something ')
-        print("--------")
-        rno = rnoFetched[0]
-        cursor.execute(''' INSERT INTO inbox VALUES (?,datetime('now'),?,?,?,'n');''', (poster, email, message, rno))
-        conn.commit()
-        print('Message sent!')
-        break
+        if rnoFetched is not None:
+            rno = rnoFetched[0]
+            cursor.execute(''' INSERT INTO inbox VALUES (?,datetime('now'),?,?,?,'n');''', (poster, email, message, rno))
+            conn.commit()
+            print('Message sent!')
+            break
+        else:
+            print('No rides available matching this request.')
+            break
