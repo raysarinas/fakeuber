@@ -183,24 +183,41 @@ def searchRequest(cursor, conn, email):
         print("Ride Requests with Pickup Location: " + filter)
         print("ID | Date | Pickup | Dropoff | Amount | Poster")
         ridSet = set()
-
-        for request in filteredRequests:
+        counter = 0
+        filteredRequestsNum = len(filteredRequests)
+        while True:
+            request = filteredRequests[counter]
             ridSet.add(int(request[0]))
             print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
+            if filteredRequestsNum > counter:
+                counter += 1
 
-        print("If you wish to message a poster about a ride, enter the ID number of the ride request. ")
-        msgNum = input("Otherwise, enter anything else: ")
-        print("input - " + msgNum)
-        #emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
+            if counter % 5 == 0 or counter == filteredRequestsNum:
+                if counter == filteredRequests:
+                    print('End of the list')
+                print("If you wish to message a poster about a ride, enter the ID number of the ride request. ")
+                msgNum = input("Enter 'EXIT' to exit the search. Otherwise, enter anything else to see next 5: ").upper()
+                print("input - " + msgNum)
+                #emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
 
-        while msgNum.isdigit() == False:
-            msgNum = input("Invalid input. Enter a number: ")
-        msgNum = int(msgNum)
-        if msgNum not in ridSet:
-            msgNum = input("ID not in listing. Try again: ")
+                # while msgNum.isdigit() == False:
+                    # msgNum = input("Invalid input. Enter a number: ")
+                if msgNum.isdigit() == False:
+                    if msgNum == 'EXIT':
+                        break
+                    else:
+                        continue
+                else:
+                    while True:
+                        msgNum = int(msgNum)
+                        if msgNum not in ridSet:
+                            msgNum = input("ID not in listing. Try again: ")
+                            continue
+                        else:
+                            break
 
-        cursor.execute(''' SELECT email FROM requests WHERE rid = ?;''', (msgNum,))
-        poster = cursor.fetchone()[0]
+                cursor.execute(''' SELECT email FROM requests WHERE rid = ?;''', (msgNum,))
+                poster = cursor.fetchone()[0]
 
 
 
