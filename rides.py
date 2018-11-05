@@ -3,6 +3,7 @@
 import sqlite3
 import main, login, re
 import time, datetime
+from clear import clear
 
 def offerRide(cursor, conn, email):
     print('Offer a ride by entering the following information: ')
@@ -22,12 +23,12 @@ def offerRide(cursor, conn, email):
         # I DID THE SAME BUT LIKE IF YOU CHANGE IT TO seats.isdigit != True
         # IT DOESNT WORK IDK WHY?????? PLS MSG ABOUT THIS WHEN U SEE IT
         seats = input("How many seats are you offering? ")
-        while seats.isdigit == False:
+        while seats.isdigit() == False:
             seats = input("Invalid input. Enter a numerical amount: ")
         seats = int(seats)
 
         price = input("What is the price per seat? ")
-        while price.isdigit == False:
+        while price.isdigit() == False:
             price = input("Invalid input. Enter a numerical amount: ")
         price = int(price)
 
@@ -41,13 +42,22 @@ def offerRide(cursor, conn, email):
         dest = input("Enter a dropoff location code or keyword: ")
         dest = getLocation(cursor, dest) #getLoc(cursor, conn, email).replace("%", "")
 
-        print("Would you like to add a car number? Enter 'Y' if yes. Otherwise, enter anything else. ", end='')
-        while True:
-            cno = None # OR SHOULD THIS BE NULL????? # if did not want to enter a car num
-            askCarNum = input()
-            if askCarNum.lower() == 'y':
-                cno = getCarNum(cursor, conn, email)
+        askCarNum = input("Would you like to add a car number? Enter 'Y' if yes. Otherwise, enter anything else: ")
+        while askCarNum.lower() == 'y':
+            cno = input("Enter your car number: ")
+            while cno.isdigit() == False:
+                cno = input("That's not a number try again: ")
+            cno = int(cno)
+            #print("input cno: " + str(type(cno)) + " " + str(cno))
+            cursor.execute("SELECT cno FROM cars WHERE owner = ? AND cno = ?;", (email, cno))
+
+            cnoFetched = cursor.fetchone()
+            #print("fetched cno: " + str(type(cnoFetched)) + " " + str(cnoFetched))
+            if (cnoFetched == None):
+                cnoFetched = input("Car is not registered with you; try again by entering 'Y', otherwise enter anything else: ")
             else:
+                cno = cnoFetched[0]
+                print("Car number registered!")
                 break
 
         rno = getRNO(cursor, conn, email)
@@ -62,7 +72,7 @@ def offerRide(cursor, conn, email):
         # UNCOMMENT THE NEXT 2 LINES
         # cursor.execute(''' SELECT * FROM enroute;''')
         # print(cursor.fetchall())
-
+        clear()
         print('Ride Offering Posted!')
 
         break
@@ -73,8 +83,8 @@ def getEnroutes(cursor, conn, rno):
 
     if askEnroutes == 'y':
         while True:
-            print("Enter an enroute location code or keyword: ", end='')
-            enroutes.append(getLocation(cursor))
+            location = input("Enter an enroute location code or keyword: ")
+            enroutes.append(getLocation(cursor, location))
             askAgain = input("If you would like to add another enroute location, Enter 'Y'. Otherwise, enter anything else: ")
             if askAgain != 'y':
                 break
@@ -88,12 +98,23 @@ def getEnroutes(cursor, conn, rno):
 def getCarNum(cursor, conn, email):
     carNum = input("Enter car number: ")
     while carNum.isdigit() == False:
-        carNum = input("Incorrect input, please enter a number: ")
+        carNum = getCarNum(cursor, conn, email)
+
     carNum = int(carNum)
+
     cursor.execute("SELECT cno from cars where owner = ? and cno = ?", (email, carNum))
-    if cursor.fetchone() == None or cursor.fetchone()[0] != carNum:
-        print("Car is not registered with you, please try again by entering 'Y'. Otherwise, no: ", end='')
-        carNum = None
+    cnoFetched = cursor.fetchone()[0]
+    print(type(cnoFetched))
+    print(" ------ TEST ----- " + str(cnoFetched))
+
+    if cursor.fetchone() == None: # or cnoFetched != carNum:
+        askAgain = input("Car is not registered with you, please try again by entering 'Y'. Otherwise, no: ")
+        if askAgain.lower() == 'y':
+            getCarNum(cursor, conn, email)
+        else:
+            return None
+    else:
+        return cnoFetched
 
 def getRNO(cursor, conn, email):
     cursor.execute(''' SELECT MAX(rides.rno) FROM rides;''')
@@ -157,8 +178,8 @@ def searchRides(cursor, conn, email):
         locList = []
 
         if ((len(keywords) > 3) or (len(keywords) == 0)):
-            print("Too many or too little keywords! Try again. ")
-            continue
+            print("Too many or too little keywords!")
+            break
 
         for word in keywords:
             loc = getLocation
