@@ -8,9 +8,10 @@ def getBookings(loginEmail, cursor, conn):
     print('-----------------------------------------------------------')
     print('1 - Book a member')
     print('2 - Cancel a booking')
+    print('3 - Go Back')
     while True:
         try:
-            choice = int(input('Please enter 1 or 2: '))
+            choice = int(input('Please enter 1, 2 or 3: '))
         except ValueError:
             print('Not a number. Do it again')
             continue
@@ -19,6 +20,8 @@ def getBookings(loginEmail, cursor, conn):
             break
         elif choice == 2:
             cancelBooking(loginEmail, cursor, conn)
+            break
+        elif choice == 3:
             break
         else:
             print('Invalid choice. Do it again')
