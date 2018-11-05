@@ -38,7 +38,7 @@ def postRequest(cursor, conn, email):
     print('Post a Ride Request by entering the following information: ')
 
     while True:
-        date = input('Ride Date (YYYY-MM-DD)?')
+        date = input('Ride Date (YYYY-MM-DD)? ')
         dateCheck = re.match("^[\d]{4}\\-[\d]{2}\\-[\d]{2}$", date)
         if dateCheck is None:
             print('Invalid Date. Try Again')
@@ -162,39 +162,49 @@ def searchRequest(cursor, conn, email):
         filteredRequests = cursor.fetchall()
         numRequests = len(filteredRequests)
 
-        # TODO:NEED TO FILTER OUT ONLY 5 PER PAGE????
         if (numRequests == 0):
-            print("There are no ride requests with the given pickup location.")
-            break
+            cursor.execute(''' SELECT DISTINCT city FROM locations;''')
+            allLocations = cursor.fetchall()
+            locationSet = set()
+            for location in allLocations:
+                locationSet.add(location[0])
 
-        else:
-            print("Ride Requests with Pickup Location: " + filter)
-            print("ID | Date | Pickup | Dropoff | Amount | Poster")
-            ridSet = set()
+            if filter not in locationSet:
+                print("There are no ride requests with the given pickup location.")
+                break
 
-            for request in filteredRequests:
-                ridSet.add(int(request[0]))
-                print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
-            print("\n")
-            print(ridSet)
+            else:
+                cursor.execute(''' SELECT DISTINCT requests.rid, requests.email, requests.rdate, requests.pickup,
+                                    requests.dropoff, requests.amount
+                                    FROM locations, requests
+                                    WHERE city = ?;''', (filter,))
+                filteredRequests = cursor.fetchall()
 
-            print("If you wish to message a poster about a ride, enter the ID number of the ride request. ")
-            msgNum = input("Otherwise, enter anything else: ")
-            print("input - " + msgNum)
-            #emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
+        print("Ride Requests with Pickup Location: " + filter)
+        print("ID | Date | Pickup | Dropoff | Amount | Poster")
+        ridSet = set()
 
-            while msgNum.isdigit() == False:
-                msgNum = input("Invalid input. Enter a number: ")
-            msgNum = int(msgNum)
-            if msgNum not in ridSet:
-                msgNum = input("ID not in listing. Try again: ")
+        for request in filteredRequests:
+            ridSet.add(int(request[0]))
+            print(str(request[0]) + " | " + str(request[2]) + " | " + str(request[3]) + " | " + str(request[4]) + " | " + str(request[5]) + " | " + str(request[1]))
 
-            cursor.execute(''' SELECT email FROM requests WHERE rid = ?;''', (msgNum,))
-            poster = cursor.fetchone()[0]
+        print("If you wish to message a poster about a ride, enter the ID number of the ride request. ")
+        msgNum = input("Otherwise, enter anything else: ")
+        print("input - " + msgNum)
+        #emailCheck = re.match("^[_\d\w]+\\@[_\d\w]+\\.[_\d\w]+$", emailMember)
+
+        while msgNum.isdigit() == False:
+            msgNum = input("Invalid input. Enter a number: ")
+        msgNum = int(msgNum)
+        if msgNum not in ridSet:
+            msgNum = input("ID not in listing. Try again: ")
+
+        cursor.execute(''' SELECT email FROM requests WHERE rid = ?;''', (msgNum,))
+        poster = cursor.fetchone()[0]
 
 
 
-            messagePoster(cursor, conn, email, msgNum, poster)
+        messagePoster(cursor, conn, email, msgNum, poster)
 
             # if emailCheck is None:
             #     print('Invalid email. Try again?')

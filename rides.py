@@ -9,7 +9,7 @@ def offerRide(cursor, conn, email):
     print('Offer a ride by entering the following information: ')
 
     while True:
-        date = input('Ride Date (YYYY-MM-DD)?')
+        date = input('Ride Date (YYYY-MM-DD)? ')
         dateCheck = re.match("^[\d]{4}\\-[\d]{2}\\-[\d]{2}$", date)
         if dateCheck is None:
             print('Invalid Date. Try Again')
@@ -51,27 +51,10 @@ def offerRide(cursor, conn, email):
             else:
                 break
 
-        # enroutes = []
-        # askEnroutes = input("Would you like to add any enroute locations? Enter 'Y' if yes. Otherwise, enter anything else: ")
-        #
-        # if askEnroutes == 'y':
-        #     while True:
-        #         print("Enter an enroute location code or keyword: ", end='')
-        #         enroutes.append(getLocation(cursor))
-        #         askAgain = input("If you would like to add another enroute location, Enter 'Y'. Otherwise, enter anything else: ")
-        #         if askAgain != 'y':
-        #             break
-
         rno = getRNO(cursor, conn, email)
         cursor.execute('''INSERT INTO rides
                 VALUES (?,?,?,?,?,?,?,?,?);''', (rno, price, date, seats, luggage, source, dest, email, cno))
         conn.commit()
-
-        # enrouteLen = len(enroutes)
-        # if enrouteLen > 0:
-        #     for i in range(enrouteLen):
-        #         cursor.execute(''' INSERT INTO enroute VALUES (?, ?);''', (rno, enroutes[i]))
-        #         conn.commit()
 
         getEnroutes(cursor, conn, rno)
 
@@ -97,18 +80,11 @@ def getEnroutes(cursor, conn, rno):
             if askAgain != 'y':
                 break
 
-    # rno = getRNO(cursor, conn, email)
-    # cursor.execute('''INSERT INTO rides
-    #         VALUES (?,?,?,?,?,?,?,?,?);''', (rno, price, date, seats, luggage, source, dest, email, cno))
-    # conn.commit()
-
     enrouteLen = len(enroutes)
     if enrouteLen > 0:
         for i in range(enrouteLen):
             cursor.execute(''' INSERT INTO enroute VALUES (?, ?);''', (rno, enroutes[i]))
             conn.commit()
-
-
 
 def getCarNum(cursor, conn, email):
     carNum = input("Enter car number: ")
