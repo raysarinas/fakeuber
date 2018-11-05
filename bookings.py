@@ -106,7 +106,6 @@ def bookBooking(loginEmail, cursor, conn):
                     else:
                         print('Please enter a non-negative value greater than zero')
                         continue
-                print(maxBno,emailMember,rno,costPerSeat,numSeatsBook,pickup,dropoff)
                 cursor.execute(''' INSERT INTO bookings VALUES (?,?,?,?,?,?,?);''', (maxBno,emailMember,rno,costPerSeat,numSeatsBook,pickup,dropoff))
                 conn.commit()
                 print('Booking has been created I guess')
