@@ -224,8 +224,8 @@ def searchRequest(cursor, conn, email):
                 sentMessage = 1
                 print('Your message has been sent!')
                 break
-    if sentMessage == 1:
-        break    
+        if sentMessage == 1:
+            break    
             # if emailCheck is None:
             #     print('Invalid email. Try again?')
             #     continue
