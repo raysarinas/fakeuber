@@ -52,6 +52,7 @@ def bookBooking(loginEmail, cursor, conn):
             userOffers = cursor.fetchall()
             # In the situation where user has offered a ride but has no bookings do a special booking
             if not userOffers:
+                print('You currently have no bookings. Let us make a new one')
                 specialBooking(loginEmail, cursor, conn)
                 break # return to main selection screen or logout
 
