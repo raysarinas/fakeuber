@@ -148,6 +148,7 @@ def manageYourRequests(cursor, conn, email):
 
 def searchRequest(cursor, conn, email):
     clear()
+    sentMessage = 0
     while True:
         # SHOULD HAVE OPTION TO SELECT LOCATION CODE OR CITY AS INPUT?
         # OR SHOULD JUST AUTOMATICALLY TRY TO CHECK?
@@ -220,8 +221,11 @@ def searchRequest(cursor, conn, email):
                 cursor.execute(''' SELECT email FROM requests WHERE rid = ?;''', (msgNum,))
                 poster = cursor.fetchone()[0]
                 messagePoster(cursor, conn, email, msgNum, poster)
+                sentMessage = 1
+                print('Your message has been sent!')
                 break
-
+    if sentMessage == 1:
+        break    
             # if emailCheck is None:
             #     print('Invalid email. Try again?')
             #     continue
