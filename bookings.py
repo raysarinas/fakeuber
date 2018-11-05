@@ -64,16 +64,38 @@ def bookBooking(loginEmail, cursor, conn):
 
 
 def getBookingInfo(loginEmail, userOffers, cursor, conn):
-    # User enters ride # they want associated with new booking
+    # Get pickup and dropoff location codes
+    goodLCode = 0
+    rno = None
+    while True:
+        pickUp = input('Enter the pickup location code: ').lower()
+        dropOff = input('Enter the dropoff location code: ').lower()
+        for x in userOffers:
+            if x[5] == pickUp:
+                goodLCode +=1
+            if x[6] == dropOff:
+                goodLCode +=1
+            if goodLCode == 2:
+                print(x[0])
+                # Get the rno of this selected lcodes
+                rno = x[0]
+                print(rno)
+                break
+        if not rno:
+            print('Invalid Location codes entered')
+            goodLCode = 0
+            continue
+        else:
+            break
+    # Get number of seats they want booked
     checkValid = 0
     while True:
         try:
-            rno = int(input('Enter Ride #: '))
             numSeatsBook = int(input('Enter # of seats you want to book: '))
         except ValueError:
             print('Not a number. Do it again')
             continue
-        # Check that rno exists
+        # Find corresponding rno
         for x in userOffers:
             if rno == x[0]:
                 # Check for warning of overbooked seats
@@ -85,7 +107,7 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
             break
         # Ride did not exist
         else:
-            print('Ride is not in current list')
+            print('Error occured. Try again')
             continue
 
 	# User enters member's email
@@ -106,23 +128,7 @@ def getBookingInfo(loginEmail, userOffers, cursor, conn):
     		break
     # Get cost per seat
     costPerSeat = int(input('Enter the cost per seat: '))
-    # Get pickup and dropoff location codes
-    goodLCode = 0
-    while True:
-        pickUp = input('Enter the pickup location code: ').lower()
-        dropOff = input('Enter the dropoff location code: ').lower()
-        cursor.execute('''SELECT lcode FROM locations''')
-        locationCodes = cursor.fetchall()
-        for x in locationCodes:
-            if x[0] == pickUp:
-                goodLCode +=1
-            if x[0] == dropOff:
-                goodLCode +=1
-        if goodLCode == 2:
-            break
-        else:
-            print('Invalid Location codes entered')
-            continue
+
     # Get highest bno in bookings. Plus 1 would represent a unique bno
     cursor.execute('''SELECT MAX(bno)+1 as lastNum FROM bookings''')
     maxBno = cursor.fetchone()
