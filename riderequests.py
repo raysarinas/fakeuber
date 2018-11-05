@@ -48,11 +48,11 @@ def postRequest(cursor, conn, email):
             date = datetime.date(year, month, day)
         #print(date)
         #print(type(date))
-        print("Enter a pickup location code or keyword: ", end='')
-        pickup = rides.getLocation(cursor) #rides.getLoc(cursor, conn, email).replace("%", "")
+        pickup = input("Enter a pickup location code or keyword: ")
+        pickup = rides.getLocation(cursor, pickup) #rides.getLoc(cursor, conn, email).replace("%", "")
         #print(pickup)
-        print("Enter a dropoff location code or keyword: ", end='')
-        dropoff = rides.getLocation(cursor) #rides.getLoc(cursor, conn, email).replace("%", "")
+        dropoff = input("Enter a dropoff location code or keyword: ")
+        dropoff = rides.getLocation(cursor, dropoff) #rides.getLoc(cursor, conn, email).replace("%", "")
         #print(dropoff)
 
         amount = input('How much are you willing to pay per seat? ')
@@ -207,14 +207,17 @@ def searchRequest(cursor, conn, email):
 def messagePoster(cursor, conn, email, msgNum, poster):
     clear()
     while True:
-        message = input("Enter the message you wish to send to " + str(poster) + "about ride #" + str(msgNum)+ ": ")
+        message = input("Enter the message you wish to send to " + str(poster) + " about ride #" + str(msgNum)+ ": ")
         timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-        
+
         cursor.execute('''SELECT rides.rno FROM rides, requests
                         WHERE rides.driver = ? AND rides.driver = requests.email
                             AND requests.rid = ? AND rides.rdate = requests.rdate
                             AND rides.src = requests.pickup AND rides.dst = requests.dropoff;''', (poster, msgNum))
         rnoFetched = cursor.fetchone()
+
+        if rnoFetched == None:
+            print('No rides available matching this request. Enter something ')
         print(rnoFetched)
         print("--------")
         break

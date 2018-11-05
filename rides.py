@@ -37,10 +37,10 @@ def offerRide(cursor, conn, email):
             luggage = input("Desciption too long. Enter a shorter description: ")
 
         # CHECK LOCATION STUFFFFFFF
-        print("Enter a pickup location code or keyword: ", end='')
-        source = getLocation(cursor) #getLoc(cursor, conn, email).replace("%", "")
-        print("Enter a dropoff location code or keyword: ", end='')
-        dest = getLocation(cursor) #getLoc(cursor, conn, email).replace("%", "")
+        source = input("Enter a pickup location code or keyword: ")
+        source = getLocation(cursor, source) #getLoc(cursor, conn, email).replace("%", "")
+        dest = input("Enter a dropoff location code or keyword: ")
+        dest = getLocation(cursor, dest) #getLoc(cursor, conn, email).replace("%", "")
 
         print("Would you like to add a car number? Enter 'Y' if yes. Otherwise, enter anything else. ", end='')
         while True:
@@ -137,9 +137,10 @@ def getRNO(cursor, conn, email):
 #     else:
 #         return True
 
-def getLocation(cursor):
+def getLocation(cursor, location):
     while True:
-        location = input().lower() # OR TYPE IN EXIT TO GO BACK?
+        location = location.lower()
+        #location = input().lower() # OR TYPE IN EXIT TO GO BACK?
         # TODO: CHECK TO MAKE SURE LOCATION CODE INPUT IS CORRECT
         # LOCATION CODE SHOULD HAVE MAX LEN 5 --- Char(5)???
         # if (location == 'EXIT'):
@@ -178,13 +179,16 @@ def searchRides(cursor, conn, email):
     while True:
         keyIn = input("Enter up to 3 keywords to search rides: ")
         keywords = keyIn.split()
+        locList = []
 
         if ((len(keywords) > 3) or (len(keywords) == 0)):
             print("Too many or too little keywords! Try again. ")
             continue
 
         for word in keywords:
+            loc = getLocation
             print(word)
+
 
 
 
