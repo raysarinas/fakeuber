@@ -8,6 +8,7 @@ from rides import *
 from bookings import *
 from riderequests import *
 from login import *
+from clear import clear # IMPORT CLEAR FROM HERE INSTEAD OF HAVING IT IN MAIN
 
 connection = None
 cursor = None
@@ -21,11 +22,11 @@ Checking if database exists or not
  https://stackoverflow.com/questions/12932607/how-to-check-if-a-sqlite3-database-exists-in-python
 '''
 
-def clear():
-    if name == 'nt':
-        _ = system('cls')
-    else:
-        _ = system('clear')
+# def clear():
+#     if name == 'nt':
+#         _ = system('cls')
+#     else:
+#         _ = system('clear')
 
 def exitProgram(conn):
     print("ok bye program exited")

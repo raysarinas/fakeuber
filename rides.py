@@ -5,7 +5,6 @@ import main, login, re
 import time, datetime
 
 def offerRide(cursor, conn, email):
-    #clear()
     print('Offer a ride by entering the following information: ')
 
     while True:
