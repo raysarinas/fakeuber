@@ -138,6 +138,41 @@ def getRNO(cursor, conn, email):
 #     else:
 #         return True
 
+def getLocation2(cursor, location):
+    while True:
+        location = location.lower()
+        #location = input().lower() # OR TYPE IN EXIT TO GO BACK?
+        # TODO: CHECK TO MAKE SURE LOCATION CODE INPUT IS CORRECT
+        # LOCATION CODE SHOULD HAVE MAX LEN 5 --- Char(5)???
+        # if (location == 'EXIT'):
+        #     break
+
+        cursor.execute('''SELECT city, prov FROM locations WHERE lcode = ? ;''', (location,))
+        found = cursor.fetchone()
+        if found != None:
+            return location
+        else:
+            keyword = '%' + location + '%'
+            cursor.execute('''SELECT * FROM locations WHERE (lcode LIKE ? OR city LIKE ? OR prov LIKE ? OR address LIKE ?);''', (keyword, keyword, keyword, keyword))
+            locationList = cursor.fetchall()
+            print("Locations with similar keyword: ")
+            print("Code | City | Province | Address")
+
+            locationSet = set()
+            for location in locationList:
+                # NEED 5 PER PAGE FILTER HERE @JACKIE
+                if location[0] not in locationSet:
+                    locationSet.add(str(location[0]))
+
+                print(str(location[0]) + " | " + str(location[1]) + " | " + str(location[2]) + " | " + str(location[3]))
+
+            selection = input("Select one of the above locations by entering the appropriate location code: ").lower()
+            if selection not in locationSet:
+                selection = input("Try again and enter an appropriate location code: ").lower()
+
+            return selection
+
+
 def getLocation(cursor, location):
     while True:
         location = location.lower()
