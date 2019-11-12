@@ -23,7 +23,15 @@ def main():
     # initialize everything i guess
     clear()
     print('Enter a database to use (with .db extension): ')
-    db = input('Otherwise, exit program: ') #"./uberDB.db"
+    # while True:
+    #     db = input('Otherwise, type exit to close program: ')
+    #     if (db == 'exit'):
+    #         exit()
+    #     dbCheck = re.match("^[\\_\d\w]+\\.db$", db)
+    #     if dbCheck is None:
+    #         print('enter a correct input!')
+    #         continue
+    db = input('Otherwise, exit program: \n') #"./uberDB.db"
     dbCheck = re.match("^[\\_\d\w]+\\.db$", db)
     if dbCheck is None:
         print("BYE I GUESS")
@@ -118,7 +126,7 @@ def systemFunctionalities(cursor, conn, email):
             # otherwise, log out
             logout()
 
-def logout(check):
+def logout():
     # log out just jumps out and restarts program
     main()
 
@@ -131,4 +139,3 @@ def exitProgram(conn):
 
 if __name__ == "__main__":
     main()
-    exit()
